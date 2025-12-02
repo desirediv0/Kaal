@@ -1,0 +1,185 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  Admin
+  Manager
+  Sales
+  ProductManager
+}
+
+model User {
+  id           String  @id @default(uuid())
+  email        String  @unique
+  name         String
+  password     String
+  refreshToken String?
+  role         Role    @default(Admin)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Products {
+  id          String  @id @default(uuid()) @db.Uuid
+  title       String
+  shortDesc   String?
+  description String
+  price       Float?
+  salePrice   Float?
+  image       String
+  slug        String  @unique
+  seoTitle    String?
+  seoDesc     String?
+
+  categories    ProductCategory[]
+  images        ProductImage[]
+  subCategories ProductSubCategory[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([created_at])
+  @@index([title])
+  @@index([slug])
+  @@map("products")
+}
+
+model ProductImage {
+  id        String   @id @default(uuid()) @db.Uuid
+  url       String
+  productId String   @db.Uuid
+  product   Products @relation(fields: [productId], references: [id])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([productId])
+  @@map("product_images")
+}
+
+model Category {
+  id            String            @id @default(uuid()) @db.Uuid
+  name          String            @default("Uncategorized")
+  products      ProductCategory[]
+  subCategories SubCategory[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([name])
+  @@index([created_at])
+  @@map("categories")
+}
+
+model ProductCategory {
+  productId  String   @db.Uuid
+  categoryId String   @db.Uuid
+  product    Products @relation(fields: [productId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  @@id([productId, categoryId])
+  @@index([productId])
+  @@index([categoryId])
+  @@map("product_categories")
+}
+
+model Leads {
+  id         String     @id @default(uuid())
+  slug       String     @unique
+  name       String
+  email      String
+  phone      String?
+  subject    String?    @default("No Subject")
+  message    String
+  type       Type       @default(onprocess)
+  comments   Comments[]
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+
+  @@index([created_at])
+  @@index([type])
+  @@map("leads")
+}
+
+enum Type {
+  onprocess
+  Converted
+  notinterested
+}
+
+model Comments {
+  id         String   @id @default(uuid())
+  message    String
+  lead_id    String
+  name       String
+  lead       Leads    @relation(fields: [lead_id], references: [id], onDelete: Cascade)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([lead_id])
+  @@index([created_at])
+  @@map("comments")
+}
+
+model UserLimit {
+  id      String @id @default(uuid())
+  maxRole Int    @default(6)
+}
+
+model Active {
+  id     String  @id @default(uuid())
+  status Boolean @default(false)
+}
+
+model Banner {
+  id          String   @id @default(uuid())
+  title       String?
+  imageUrl    String
+  linkUrl     String?
+  description String?
+  position    Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([position])
+  @@index([isActive])
+}
+
+model ProductSubCategory {
+  productId     String      @db.Uuid
+  subCategoryId String      @db.Uuid
+  product       Products    @relation(fields: [productId], references: [id])
+  subCategory   SubCategory @relation(fields: [subCategoryId], references: [id])
+
+  @@id([productId, subCategoryId])
+  @@index([productId])
+  @@index([subCategoryId])
+  @@map("product_subcategories")
+}
+
+model SubCategory {
+  id         String               @id @default(uuid()) @db.Uuid
+  name       String               @unique
+  image      String?
+  categoryId String               @db.Uuid
+  category   Category             @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  products   ProductSubCategory[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([name])
+  @@index([categoryId])
+  @@index([created_at])
+  @@map("sub_categories")
+}
