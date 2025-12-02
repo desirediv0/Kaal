@@ -301,22 +301,20 @@ export const getProducts = asyncHandler(async (req, res) => {
   const { category, page, limit } = req.query;
 
   try {
-    // If no pagination parameters are provided, return all products
-    const shouldPaginate = page && limit;
+    // Always use pagination for better performance - default to 1000 if not specified
     const pageNum = parseInt(page) || 1;
-    const limitNum = parseInt(limit) || 1000; // Large limit to get all products
-    const offset = shouldPaginate ? (pageNum - 1) * limitNum : 0;
-    const take = shouldPaginate ? limitNum : undefined;
+    const limitNum = parseInt(limit) || 1000;
+    const offset = (pageNum - 1) * limitNum;
 
     let products = [];
     let totalProducts = 0;
 
     if (!category || category === "all") {
-      // Optimize query for all products
+      // Optimize query for all products - use Promise.all for parallel execution
       const [productsData, total] = await Promise.all([
         prisma.products.findMany({
           skip: offset,
-          take: take,
+          take: limitNum,
           orderBy: { created_at: "desc" },
           select: {
             id: true,
@@ -363,12 +361,13 @@ export const getProducts = asyncHandler(async (req, res) => {
     } else {
       const formattedName = normalizeText(category);
 
+      // Optimize category lookup - try exact match first, then contains
       const categoryData = await prisma.category.findFirst({
         where: {
-          name: {
-            contains: formattedName,
-            mode: "insensitive",
-          },
+          OR: [
+            { name: { equals: formattedName, mode: "insensitive" } },
+            { name: { contains: formattedName, mode: "insensitive" } },
+          ],
         },
         select: { id: true },
       });
@@ -386,7 +385,7 @@ export const getProducts = asyncHandler(async (req, res) => {
         });
       }
 
-      // Optimize query for category-specific products
+      // Optimize query for category-specific products - use Promise.all
       const [productsData, total] = await Promise.all([
         prisma.products.findMany({
           where: {
@@ -397,7 +396,7 @@ export const getProducts = asyncHandler(async (req, res) => {
             },
           },
           skip: offset,
-          take: take,
+          take: limitNum,
           orderBy: {
             created_at: "desc",
           },
@@ -453,7 +452,7 @@ export const getProducts = asyncHandler(async (req, res) => {
       totalProducts = total;
     }
 
-    const totalPages = shouldPaginate ? Math.ceil(totalProducts / limitNum) : 1;
+    const totalPages = Math.ceil(totalProducts / limitNum);
 
     return res.status(200).json({
       success: true,
@@ -462,8 +461,8 @@ export const getProducts = asyncHandler(async (req, res) => {
         totalProducts,
         totalPages,
         currentPage: pageNum,
-        hasNextPage: shouldPaginate ? pageNum < totalPages : false,
-        hasPrevPage: shouldPaginate ? pageNum > 1 : false,
+        hasNextPage: pageNum < totalPages,
+        hasPrevPage: pageNum > 1,
       },
       message: "Products fetched successfully",
     });

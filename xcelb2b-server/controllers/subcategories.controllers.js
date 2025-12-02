@@ -351,20 +351,10 @@ export const getSubCategoryProducts = asyncHandler(async (req, res) => {
   const { subcategory, page, limit } = req.query;
 
   try {
-    // If no pagination parameters are provided, return all products
-    const shouldPaginate = page && limit;
+    // Always use pagination for better performance
     const pageNum = parseInt(page) || 1;
-    const limitNum = parseInt(limit) || 1000; // Large limit to get all products
-    const offset = shouldPaginate ? (pageNum - 1) * limitNum : 0;
-    const take = shouldPaginate ? limitNum : undefined;
-
-    console.log("Subcategory products request:", {
-      subcategory,
-      page,
-      limit,
-      shouldPaginate,
-      take,
-    });
+    const limitNum = parseInt(limit) || 1000;
+    const offset = (pageNum - 1) * limitNum;
 
     let products = [];
     let totalProducts = 0;
@@ -374,7 +364,7 @@ export const getSubCategoryProducts = asyncHandler(async (req, res) => {
       const [productsData, total] = await Promise.all([
         prisma.products.findMany({
           skip: offset,
-          take: take,
+          take: limitNum,
           orderBy: { created_at: "desc" },
           select: {
             id: true,
@@ -418,76 +408,43 @@ export const getSubCategoryProducts = asyncHandler(async (req, res) => {
 
       products = productsData;
       totalProducts = total;
-      console.log("All products fetched:", {
-        count: products.length,
-        total: totalProducts,
-      });
     } else {
       // Robust normalization and matching for subcategory
       const incoming = robustNormalize(subcategory);
 
-      console.log("Normalized subcategory:", incoming);
+      // Optimize: Combine all matching strategies into a single OR query
+      // This reduces database round trips from 4+ to just 1
+      const dashVariants = [
+        incoming,
+        incoming.replace(/\s+/g, " - "),
+        incoming.replace(/\s*-\s*/g, " "),
+        incoming.replace(/\s+/g, "-"),
+      ];
 
-      // Try multiple matching strategies
-      let subCategoryData = null;
+      const ampVariant = incoming.replace(/and/g, "&");
+      const andVariant = incoming.replace(/&/g, "and");
 
-      // Strategy 1: Exact match with normalized name
-      subCategoryData = await prisma.subCategory.findFirst({
+      // Single query with all strategies combined
+      const subCategoryData = await prisma.subCategory.findFirst({
         where: {
-          name: { equals: incoming, mode: "insensitive" },
+          OR: [
+            // Exact matches
+            { name: { equals: incoming, mode: "insensitive" } },
+            ...dashVariants.slice(1).map((variant) => ({
+              name: { equals: variant, mode: "insensitive" },
+            })),
+            { name: { equals: ampVariant, mode: "insensitive" } },
+            { name: { equals: andVariant, mode: "insensitive" } },
+            // Contains matches
+            { name: { contains: incoming, mode: "insensitive" } },
+            { name: { contains: ampVariant, mode: "insensitive" } },
+            { name: { contains: andVariant, mode: "insensitive" } },
+          ],
         },
         select: { id: true },
       });
 
-      // Strategy 2: If no exact match, try with contains
       if (!subCategoryData) {
-        subCategoryData = await prisma.subCategory.findFirst({
-          where: {
-            name: { contains: incoming, mode: "insensitive" },
-          },
-          select: { id: true },
-        });
-      }
-
-      // Strategy 3: Try with dash variants (add/remove dashes)
-      if (!subCategoryData) {
-        const dashVariants = [
-          incoming.replace(/\s+/g, " - "),
-          incoming.replace(/\s*-\s*/g, " "),
-          incoming.replace(/\s+/g, "-"),
-        ];
-
-        for (const variant of dashVariants) {
-          subCategoryData = await prisma.subCategory.findFirst({
-            where: {
-              name: { equals: variant, mode: "insensitive" },
-            },
-            select: { id: true },
-          });
-          if (subCategoryData) break;
-        }
-      }
-
-      // Strategy 4: Try with ampersand/and variants
-      if (!subCategoryData) {
-        const ampVariant = incoming.replace(/and/g, "&");
-        const andVariant = incoming.replace(/&/g, "and");
-
-        subCategoryData = await prisma.subCategory.findFirst({
-          where: {
-            OR: [
-              { name: { equals: ampVariant, mode: "insensitive" } },
-              { name: { equals: andVariant, mode: "insensitive" } },
-              { name: { contains: ampVariant, mode: "insensitive" } },
-              { name: { contains: andVariant, mode: "insensitive" } },
-            ],
-          },
-          select: { id: true },
-        });
-      }
-
-      if (!subCategoryData) {
-        console.log("Subcategory not found:", incoming);
         return res.status(200).json({
           success: false,
           data: {
@@ -500,9 +457,7 @@ export const getSubCategoryProducts = asyncHandler(async (req, res) => {
         });
       }
 
-      console.log("Found subcategory:", subCategoryData);
-
-      // Optimize query for subcategory-specific products
+      // Optimize query for subcategory-specific products - use Promise.all
       const [productsData, total] = await Promise.all([
         prisma.products.findMany({
           where: {
@@ -513,7 +468,7 @@ export const getSubCategoryProducts = asyncHandler(async (req, res) => {
             },
           },
           skip: offset,
-          take: take,
+          take: limitNum,
           orderBy: {
             created_at: "desc",
           },
@@ -567,14 +522,9 @@ export const getSubCategoryProducts = asyncHandler(async (req, res) => {
 
       products = productsData;
       totalProducts = total;
-      console.log("Subcategory products fetched:", {
-        count: products.length,
-        total: totalProducts,
-        subcategory: incoming,
-      });
     }
 
-    const totalPages = shouldPaginate ? Math.ceil(totalProducts / limitNum) : 1;
+    const totalPages = Math.ceil(totalProducts / limitNum);
 
     return res.status(200).json({
       success: true,
@@ -583,8 +533,8 @@ export const getSubCategoryProducts = asyncHandler(async (req, res) => {
         totalProducts,
         totalPages,
         currentPage: pageNum,
-        hasNextPage: shouldPaginate ? pageNum < totalPages : false,
-        hasPrevPage: shouldPaginate ? pageNum > 1 : false,
+        hasNextPage: pageNum < totalPages,
+        hasPrevPage: pageNum > 1,
       },
       message: "Products fetched successfully",
     });

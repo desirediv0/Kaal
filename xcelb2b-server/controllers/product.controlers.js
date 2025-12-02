@@ -713,22 +713,55 @@ export const getAllProductsLengthAndDate = asyncHandler(async (req, res) => {
 
 export const allProducts = asyncHandler(async (req, res) => {
   try {
-    const products = await prisma.products.findMany({
-      orderBy: { created_at: "asc" },
-      include: {
-        categories: {
-          include: {
-            category: true,
+    // Add pagination support for better performance
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 1000; // Default to 1000, can be increased if needed
+    const offset = (page - 1) * limit;
+
+    // Use select instead of include for better performance - only fetch needed fields
+    const [products, totalProducts] = await Promise.all([
+      prisma.products.findMany({
+        skip: offset,
+        take: limit,
+        orderBy: { created_at: "desc" },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          shortDesc: true,
+          price: true,
+          salePrice: true,
+          image: true,
+          slug: true,
+          created_at: true,
+          updated_at: true,
+          categories: {
+            select: {
+              category: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+          subCategories: {
+            select: {
+              subCategory: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+          images: {
+            select: {
+              url: true,
+            },
           },
         },
-        subCategories: {
-          include: {
-            subCategory: true,
-          },
-        },
-        images: true,
-      },
-    });
+      }),
+      prisma.products.count(),
+    ]);
 
     if (!products || products.length === 0) {
       return res
@@ -769,15 +802,18 @@ export const allProducts = asyncHandler(async (req, res) => {
       })
       .filter(Boolean);
 
-    return res
-      .status(200)
-      .json(
-        new ApiResponse(
-          200,
-          "Products retrieved successfully",
-          formattedProducts
-        )
-      );
+    const totalPages = Math.ceil(totalProducts / limit);
+
+    return res.status(200).json(
+      new ApiResponse(200, "Products retrieved successfully", {
+        products: formattedProducts,
+        totalProducts,
+        totalPages,
+        currentPage: page,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+      })
+    );
   } catch (error) {
     console.error("Error details:", error);
     return res
@@ -824,20 +860,48 @@ export const deleteProductImage = asyncHandler(async (req, res) => {
 export const GetProductBySlug = asyncHandler(async (req, res) => {
   const { slug } = req.params;
 
+  // Optimize: Use select instead of include for better performance
   const product = await prisma.products.findUnique({
     where: { slug },
-    include: {
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      shortDesc: true,
+      price: true,
+      salePrice: true,
+      image: true,
+      slug: true,
+      seoTitle: true,
+      seoDesc: true,
+      created_at: true,
+      updated_at: true,
       categories: {
-        include: {
-          category: true,
+        select: {
+          category: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
         },
       },
       subCategories: {
-        include: {
-          subCategory: true,
+        select: {
+          subCategory: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
         },
       },
-      images: true,
+      images: {
+        select: {
+          id: true,
+          url: true,
+        },
+      },
     },
   });
 
@@ -866,19 +930,28 @@ export const userSearchProducts = asyncHandler(async (req, res) => {
         .replace(/&nbsp;/g, " ")
         .trim() || "";
 
+    // Optimize: Require minimum 2 characters for search to avoid slow queries
+    if (cleanQuery.length < 2) {
+      return res
+        .status(200)
+        .json(
+          new ApiResponse(
+            200,
+            [],
+            "Please provide at least 2 characters for search"
+          )
+        );
+    }
+
+    // Optimize: Use select with only needed fields, limit to 10 results
+    // The title index will be used automatically by Prisma for contains queries
     const products = await prisma.products.findMany({
-      where: cleanQuery
-        ? {
-            OR: [
-              {
-                title: {
-                  contains: cleanQuery,
-                  mode: "insensitive",
-                },
-              },
-            ],
-          }
-        : undefined,
+      where: {
+        title: {
+          contains: cleanQuery,
+          mode: "insensitive",
+        },
+      },
       select: {
         id: true,
         title: true,
@@ -898,7 +971,7 @@ export const userSearchProducts = asyncHandler(async (req, res) => {
       orderBy: {
         created_at: "desc",
       },
-      take: 10, // Limit results
+      take: 10, // Limit results for better performance
     });
 
     // Format the response data

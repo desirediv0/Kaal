@@ -50,6 +50,7 @@ model Products {
   @@index([created_at])
   @@index([title])
   @@index([slug])
+  @@index([created_at, title]) // Composite index for sorting + filtering
   @@map("products")
 }
 
@@ -77,6 +78,7 @@ model Category {
 
   @@index([name])
   @@index([created_at])
+  @@index([name, created_at]) // Composite index for name search + sorting
   @@map("categories")
 }
 
@@ -89,6 +91,7 @@ model ProductCategory {
   @@id([productId, categoryId])
   @@index([productId])
   @@index([categoryId])
+  @@index([categoryId, productId]) // Composite index for category-based product queries
   @@map("product_categories")
 }
 
@@ -164,6 +167,7 @@ model ProductSubCategory {
   @@id([productId, subCategoryId])
   @@index([productId])
   @@index([subCategoryId])
+  @@index([subCategoryId, productId]) // Composite index for subcategory-based product queries
   @@map("product_subcategories")
 }
 
@@ -181,5 +185,7 @@ model SubCategory {
   @@index([name])
   @@index([categoryId])
   @@index([created_at])
+  @@index([categoryId, name]) // Composite index for category + name lookup
+  @@index([name, created_at]) // Composite index for name search + sorting
   @@map("sub_categories")
 }
