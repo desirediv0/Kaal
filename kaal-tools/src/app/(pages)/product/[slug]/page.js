@@ -286,8 +286,8 @@ export default function ProductPage() {
                       <div className="p-1">
                         <Card
                           className={`hover:shadow-md transition-all duration-300 cursor-pointer ${mainImage === image
-                              ? "ring-2 ring-[var(--maincolor)]"
-                              : ""
+                            ? "ring-2 ring-[var(--maincolor)]"
+                            : ""
                             }`}
                         >
                           <CardContent className="flex aspect-square relative p-0">
@@ -321,8 +321,8 @@ export default function ProductPage() {
           </div>
 
           {/* Product Details Section */}
-          <div className="space-y-6 lg:space-y-8">
-            <h1 className="text-2xl lg:text-3xl font-[500] text-gray-700 mb-6 uppercase break-words">
+          <div className="space-y-4">
+            <h1 className="text-2xl lg:text-3xl font-[500] text-gray-600 mb-3 uppercase break-words">
               {product.title}
             </h1>
 
@@ -331,7 +331,7 @@ export default function ProductPage() {
               {productFeatures.map((feature, index) => (
                 <div
                   key={index}
-                  className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg hover:shadow-md transition-all"
+                  className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg hover:shadow-md transition-all"
                 >
                   {feature.icon}
                   <span className="text-gray-700 text-sm sm:text-base">
@@ -342,7 +342,7 @@ export default function ProductPage() {
             </div>
 
             {/* Short Description */}
-            <div className="bg-gray-50 p-4 sm:p-6 rounded-lg overflow-hidden text-gray-500 text-sm leading-relaxed">
+            <div className="bg-gray-50 p-4 rounded-lg overflow-hidden text-gray-500 text-sm leading-relaxed">
               <div
                 className="overflow-x-auto prose prose-sm max-w-none prose-p:text-gray-500 prose-strong:text-gray-600 prose-a:text-[var(--maincolor)]"
                 dangerouslySetInnerHTML={{ __html: product.shortDesc }}
@@ -370,7 +370,7 @@ export default function ProductPage() {
                 Description
               </h2>
             </div>
-            <div className="bg-gray-50 p-4 sm:p-6 rounded-lg overflow-hidden">
+            <div className="bg-gray-50 p-4  rounded-lg overflow-hidden">
               <div
                 className="overflow-x-auto prose prose-sm max-w-none
                   prose-p:text-gray-500 prose-li:text-gray-500 prose-strong:text-gray-600
