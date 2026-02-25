@@ -220,11 +220,10 @@ export default function ProductPage() {
                   key={cat.categoryId}
                   onClick={() => updateUrl({ category: cat.category.name })}
                   className={`px-3 py-1 text-sm font-bold whitespace-nowrap
-                                     ${
-                                       cat.active
-                                         ? "text-[var(--maincolor)]"
-                                         : "text-gray-600 hover:text-[var(--maincolor)]"
-                                     } 
+                                     ${cat.active
+                      ? "text-[var(--maincolor)]"
+                      : "text-gray-600 hover:text-[var(--maincolor)]"
+                    } 
                                      transition-all uppercase`}
                 >
                   {cat.category.name}
@@ -242,11 +241,10 @@ export default function ProductPage() {
                       updateUrl({ subcategory: subCat.subCategory.name })
                     }
                     className={`px-2 py-1 text-sm font-medium flex items-center whitespace-nowrap
-                                     ${
-                                       subCat.active
-                                         ? "text-[var(--maincolor)]"
-                                         : "text-gray-500 hover:text-[var(--maincolor)]"
-                                     }
+                                     ${subCat.active
+                        ? "text-[var(--maincolor)]"
+                        : "text-gray-500 hover:text-[var(--maincolor)]"
+                      }
                                      transition-all uppercase`}
                   >
                     <span className="text-gray-400 mr-2">
@@ -287,11 +285,10 @@ export default function ProductPage() {
                     <CarouselItem key={index} className="basis-1/3">
                       <div className="p-1">
                         <Card
-                          className={`hover:shadow-md transition-all duration-300 cursor-pointer ${
-                            mainImage === image
+                          className={`hover:shadow-md transition-all duration-300 cursor-pointer ${mainImage === image
                               ? "ring-2 ring-[var(--maincolor)]"
                               : ""
-                          }`}
+                            }`}
                         >
                           <CardContent className="flex aspect-square relative p-0">
                             <Image
@@ -325,7 +322,7 @@ export default function ProductPage() {
 
           {/* Product Details Section */}
           <div className="space-y-6 lg:space-y-8">
-            <h1 className="text-2xl lg:text-3xl font-[500] text-gray-900 mb-6 uppercase break-words">
+            <h1 className="text-2xl lg:text-3xl font-[500] text-gray-700 mb-6 uppercase break-words">
               {product.title}
             </h1>
 
@@ -345,9 +342,9 @@ export default function ProductPage() {
             </div>
 
             {/* Short Description */}
-            <div className="prose max-w-none bg-gray-50 p-4 sm:p-6 rounded-lg overflow-hidden">
+            <div className="bg-gray-50 p-4 sm:p-6 rounded-lg overflow-hidden text-gray-500 text-sm leading-relaxed">
               <div
-                className="overflow-x-auto"
+                className="overflow-x-auto prose prose-sm max-w-none prose-p:text-gray-500 prose-strong:text-gray-600 prose-a:text-[var(--maincolor)]"
                 dangerouslySetInnerHTML={{ __html: product.shortDesc }}
               />
             </div>
@@ -373,9 +370,14 @@ export default function ProductPage() {
                 Description
               </h2>
             </div>
-            <div className="prose max-w-none bg-gray-50 p-4 sm:p-8 rounded-lg overflow-hidden">
+            <div className="bg-gray-50 p-4 sm:p-6 rounded-lg overflow-hidden">
               <div
-                className="overflow-x-auto"
+                className="overflow-x-auto prose prose-sm max-w-none
+                  prose-p:text-gray-500 prose-li:text-gray-500 prose-strong:text-gray-600
+                  prose-a:text-[var(--maincolor)] prose-headings:text-gray-600
+                  [&_table]:text-sm [&_table]:w-auto [&_th]:px-4 [&_th]:py-2 [&_th]:text-sm [&_th]:font-semibold
+                  [&_td]:px-4 [&_td]:py-2 [&_td]:text-gray-500 [&_td]:text-sm
+                  [&_table]:border-collapse [&_tr]:border-b [&_tr]:border-gray-200"
                 dangerouslySetInnerHTML={{ __html: product.description }}
               />
             </div>

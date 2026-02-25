@@ -412,8 +412,8 @@ export const getSubCategoryProducts = asyncHandler(async (req, res) => {
       // Robust normalization and matching for subcategory
       const incoming = robustNormalize(subcategory);
 
-      // Optimize: Combine all matching strategies into a single OR query
-      // This reduces database round trips from 4+ to just 1
+      // Use exact-match only strategies to avoid matching subcategories
+      // whose names merely CONTAIN the search term (e.g. "fly cutters" when searching "cutters")
       const dashVariants = [
         incoming,
         incoming.replace(/\s+/g, " - "),
@@ -424,21 +424,17 @@ export const getSubCategoryProducts = asyncHandler(async (req, res) => {
       const ampVariant = incoming.replace(/and/g, "&");
       const andVariant = incoming.replace(/&/g, "and");
 
-      // Single query with all strategies combined
+      // Single query with exact-match strategies only (no contains)
       const subCategoryData = await prisma.subCategory.findFirst({
         where: {
           OR: [
-            // Exact matches
+            // Exact matches only
             { name: { equals: incoming, mode: "insensitive" } },
             ...dashVariants.slice(1).map((variant) => ({
               name: { equals: variant, mode: "insensitive" },
             })),
             { name: { equals: ampVariant, mode: "insensitive" } },
             { name: { equals: andVariant, mode: "insensitive" } },
-            // Contains matches
-            { name: { contains: incoming, mode: "insensitive" } },
-            { name: { contains: ampVariant, mode: "insensitive" } },
-            { name: { contains: andVariant, mode: "insensitive" } },
           ],
         },
         select: { id: true },

@@ -23,3 +23,4 @@ CREATE INDEX IF NOT EXISTS "products_title_created_gin_idx" ON "products" USING 
 -- ANALYZE categories;
 -- ANALYZE sub_categories;
 
+

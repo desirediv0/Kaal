@@ -143,47 +143,31 @@
 
 /* Responsive table styles */
 .prose table {
-  width: 100%;
-  border-collapse: collapse;
+  width: auto !important;
+  max-width: 100%;
+  border-collapse: collapse !important;
   margin: 0;
-  border: 1px solid #000000;
-  min-width: 100%;
+  border: 1px solid #e2e8f0 !important;
   overflow-x: auto;
+  font-size: 13px;
 }
 
-.prose td {
-  padding: 8px 12px;
+.prose td,
+.prose th {
+  padding: 6px 14px;
   text-align: center;
-  border: 1px solid #000000;
-  font-family: verdana, geneva, sans-serif;
-  font-size: 14px;
+  border: 1px solid #e2e8f0;
+  font-size: 13px;
+  color: #6b7280;
   word-wrap: break-word;
-  max-width: 200px;
+  max-width: 220px;
 }
 
-@media (min-width: 768px) {
-  .prose td {
-    font-size: 16px;
-    padding: 12px;
-  }
-}
-
-.prose tr:first-child {
-  font-weight: bold;
-}
-
-.prose tr:first-child strong,
-.prose tr:first-child td {
-  font-family: verdana, geneva, sans-serif;
-  font-size: 14px;
-  font-weight: bold;
-}
-
-@media (min-width: 768px) {
-  .prose tr:first-child strong,
-  .prose tr:first-child td {
-    font-size: 16px;
-  }
+.prose tr:first-child td,
+.prose tr:first-child th {
+  font-size: 13px;
+  font-weight: 600;
+  color: #4b5563;
 }
 
 .prose {
@@ -193,17 +177,13 @@
 }
 
 .prose :where(td):not(:where([class~="not-prose"] *)) {
-  padding: 8px 12px;
+  padding: 6px 14px;
   vertical-align: middle;
-  border: 1px solid #000000;
+  border: 1px solid #e2e8f0;
+  color: #6b7280;
+  font-size: 13px;
   word-wrap: break-word;
-  max-width: 200px;
-}
-
-@media (min-width: 768px) {
-  .prose :where(td):not(:where([class~="not-prose"] *)) {
-    padding: 12px;
-  }
+  max-width: 220px;
 }
 
 /* Table container for horizontal scroll on mobile */
