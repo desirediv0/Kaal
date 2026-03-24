@@ -280,10 +280,9 @@ export default function ProductDetailClient({ initialProduct }) {
                 Description
               </h2>
             </div>
-            <div className="bg-gray-50 p-4 rounded-lg overflow-hidden w-full">
+            <div className="bg-slate-50/90 p-4 md:p-6 rounded-xl border border-slate-200/80 overflow-hidden w-full shadow-sm">
               <div
-                className="product-description-tables product-table-scroll w-full
-                  [&_p]:text-gray-500 [&_li]:text-gray-500 [&_a]:text-[var(--maincolor)] [&_h2]:text-gray-600 [&_h3]:text-gray-600"
+                className="product-html-from-editor product-description-tables product-table-scroll w-full text-slate-800 leading-relaxed text-[15px] md:text-[16px] antialiased [&_a]:text-[var(--maincolor)] [&_a]:underline [&_a]:font-medium"
                 dangerouslySetInnerHTML={{ __html: product.description }}
               />
             </div>

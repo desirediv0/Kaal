@@ -97,40 +97,104 @@ body {
   }
 }
 
-/* Jodit editor - table style (blue header, sub-header white, borders, zebra) */
+/*
+ * Jodit (admin) — kaal-tools product page jaisa hi table theme
+ * --pt-* values kaal-tools .product-description-tables ke saath match rakho
+ */
+.jodit-wysiwyg {
+  --pt-border: #94a3b8;
+  --pt-header-bg: #1d43a4;
+  --pt-header-fg: #ffffff;
+  --pt-body-fg: #1e293b;
+  --pt-zebra-odd: #f1f5f9;
+  --pt-zebra-even: #ffffff;
+  font-size: 15px;
+  line-height: 1.65;
+  color: #1e293b;
+}
+@media (min-width: 768px) {
+  .jodit-wysiwyg {
+    font-size: 16px;
+  }
+}
+.jodit-wysiwyg p {
+  margin: 0.55em 0;
+}
+.jodit-wysiwyg ul,
+.jodit-wysiwyg ol {
+  margin: 0.55em 0;
+  padding-left: 1.4rem;
+}
+
 .jodit-wysiwyg table {
   border-collapse: collapse;
   width: 100%;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--pt-border);
+  font-size: 15px;
+  max-width: 100%;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+@media (min-width: 768px) {
+  .jodit-wysiwyg table {
+    font-size: 16px;
+  }
 }
 .jodit-wysiwyg table th,
 .jodit-wysiwyg table td {
-  border: 1px solid #cbd5e1;
-  padding: 10px 12px;
+  border: 1px solid var(--pt-border);
+  padding: 14px 16px;
+  min-height: 48px;
+  box-sizing: border-box;
   text-align: center;
-  font-size: 13px;
+  vertical-align: middle;
+  line-height: 1.5;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
+.jodit-wysiwyg table thead th,
+.jodit-wysiwyg table thead td {
+  background-color: var(--pt-header-bg) !important;
+  color: var(--pt-header-fg) !important;
+  font-weight: 700 !important;
+}
+.jodit-wysiwyg table thead th *,
+.jodit-wysiwyg table thead td * {
+  color: #ffffff !important;
+}
+.jodit-wysiwyg table:not(:has(thead)) > tbody > tr:first-child th,
+.jodit-wysiwyg table:not(:has(thead)) > tbody > tr:first-child td,
 .jodit-wysiwyg table tr:first-child th,
-.jodit-wysiwyg table tr:first-child td,
-.jodit-wysiwyg table thead tr:first-child th,
-.jodit-wysiwyg table thead tr:first-child td {
-  background-color: #1d43a4 !important;
-  color: #ffffff !important;
+.jodit-wysiwyg table tr:first-child td {
+  background-color: var(--pt-header-bg) !important;
+  color: var(--pt-header-fg) !important;
   font-weight: 700 !important;
 }
-.jodit-wysiwyg table tr:first-child th *,
-.jodit-wysiwyg table tr:first-child td * {
-  color: #ffffff !important;
+.jodit-wysiwyg table tbody tr td,
+.jodit-wysiwyg table tbody tr th,
+.jodit-wysiwyg table tr:nth-child(n+3) td,
+.jodit-wysiwyg table tr:nth-child(n+3) th {
+  color: var(--pt-body-fg);
+  font-weight: 400;
 }
-.jodit-wysiwyg table tr:nth-child(2) th,
-.jodit-wysiwyg table tr:nth-child(2) td {
-  background-color: #ffffff !important;
-  color: #000000 !important;
+.jodit-wysiwyg table tbody tr:nth-child(odd) td,
+.jodit-wysiwyg table tbody tr:nth-child(odd) th,
+.jodit-wysiwyg table tr:nth-child(odd):not(:first-child):not(:nth-child(2)) td,
+.jodit-wysiwyg table tr:nth-child(odd):not(:first-child):not(:nth-child(2)) th {
+  background-color: var(--pt-zebra-odd) !important;
+}
+.jodit-wysiwyg table tbody tr:nth-child(even) td,
+.jodit-wysiwyg table tbody tr:nth-child(even) th,
+.jodit-wysiwyg table tr:nth-child(even):not(:first-child):not(:nth-child(2)) td {
+  background-color: var(--pt-zebra-even) !important;
+}
+/* Rowspan sub-header row (Inch/mm) — colgroup ke baad bhi ~ tbody */
+.jodit-wysiwyg table thead:has(> tr:only-child) ~ tbody:first-of-type > tr:first-child th,
+.jodit-wysiwyg table thead:has(> tr:only-child) ~ tbody:first-of-type > tr:first-child td {
+  background-color: var(--pt-header-bg) !important;
+  color: var(--pt-header-fg) !important;
   font-weight: 700 !important;
 }
-.jodit-wysiwyg table tbody tr:nth-child(odd) td {
-  background-color: #f1f5f9;
-}
-.jodit-wysiwyg table tbody tr:nth-child(even) td {
-  background-color: #ffffff;
+.jodit-wysiwyg table thead:has(> tr:only-child) ~ tbody:first-of-type > tr:first-child th [style],
+.jodit-wysiwyg table thead:has(> tr:only-child) ~ tbody:first-of-type > tr:first-child td [style] {
+  color: inherit !important;
 }

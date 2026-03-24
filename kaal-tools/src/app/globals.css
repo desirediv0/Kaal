@@ -222,35 +222,86 @@
   background: #64748b;
 }
 
-/* Product tables - BLUE header (Jodit), borders - prose conflict fix */
+/* Jodit HTML: paragraphs/lists — readable, store theme */
+.product-html-from-editor > p,
+.product-html-from-editor p {
+  margin: 0.55em 0 0.85em;
+  line-height: 1.7;
+}
+.product-html-from-editor > p:first-child {
+  margin-top: 0;
+}
+.product-html-from-editor ul,
+.product-html-from-editor ol {
+  margin: 0.55em 0 0.85em;
+  padding-left: 1.4rem;
+  line-height: 1.65;
+}
+.product-html-from-editor li {
+  margin-bottom: 0.4em;
+}
+.product-html-from-editor h2,
+.product-html-from-editor h3,
+.product-html-from-editor h4 {
+  margin: 0.85em 0 0.45em;
+  font-weight: 600;
+  color: #1e293b;
+  letter-spacing: -0.01em;
+}
+.product-html-from-editor strong,
+.product-html-from-editor b {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+/*
+ * Product tables — admin (Jodit) + site same look
+ * --pt-* = single source of truth (match xcelb2b-client .jodit-wysiwyg)
+ */
+.product-description-tables {
+  --pt-border: #94a3b8;
+  --pt-header-bg: #1d43a4;
+  --pt-header-fg: #ffffff;
+  --pt-body-fg: #1e293b;
+  --pt-zebra-odd: #f1f5f9;
+  --pt-zebra-even: #ffffff;
+}
+
 .product-description-tables table {
-  border: 1px solid #94a3b8 !important;
+  border: 1px solid var(--pt-border) !important;
   border-collapse: collapse !important;
   width: 100% !important;
   min-width: 320px !important;
-  font-size: 13px !important;
+  max-width: 100% !important;
   table-layout: auto !important;
+  font-size: 15px !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
 }
 @media (min-width: 768px) {
   .product-description-tables table {
-    font-size: 14px !important;
+    font-size: 16px !important;
   }
 }
 .product-description-tables table th,
 .product-description-tables table td {
-  border: 1px solid #94a3b8 !important;
-  padding: 10px 12px !important;
+  border: 1px solid var(--pt-border) !important;
+  padding: 14px 16px !important;
+  min-height: 48px !important;
+  box-sizing: border-box !important;
   text-align: center !important;
-  font-size: inherit !important;
+  vertical-align: middle !important;
+  line-height: 1.5 !important;
   word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  hyphens: auto;
 }
 
-/* HEADER - saari <thead> rows (Code/Taper + Inch/mm) same blue */
+/* HEADER — saari <thead> rows same blue */
 .product-description-tables table thead th,
 .product-description-tables table thead td {
-  background-color: #1d43a4 !important;
-  background: #1d43a4 !important;
-  color: #ffffff !important;
+  background-color: var(--pt-header-bg) !important;
+  background: var(--pt-header-bg) !important;
+  color: var(--pt-header-fg) !important;
   font-weight: 700 !important;
 }
 .product-description-tables table thead th *,
@@ -265,9 +316,9 @@
 .product-description-tables table tbody:first-child tr:first-child td,
 .product-description-tables table tr:first-child th,
 .product-description-tables table tr:first-child td {
-  background-color: #1d43a4 !important;
-  background: #1d43a4 !important;
-  color: #ffffff !important;
+  background-color: var(--pt-header-bg) !important;
+  background: var(--pt-header-bg) !important;
+  color: var(--pt-header-fg) !important;
   font-weight: 700 !important;
 }
 .product-description-tables table:not(:has(thead)) > tbody > tr:first-child th *,
@@ -279,53 +330,48 @@
 
 /* <thead> ke bina: doosri row sub-header (Inch/mm) sirf jab cells <th> hon — same blue */
 .product-description-tables table:not(:has(thead)) > tbody > tr:nth-child(2) th {
-  background-color: #1d43a4 !important;
-  color: #ffffff !important;
+  background-color: var(--pt-header-bg) !important;
+  color: var(--pt-header-fg) !important;
   font-weight: 700 !important;
 }
 .product-description-tables table:not(:has(thead)) > tbody > tr:nth-child(2) th * {
   color: #ffffff !important;
 }
 
-/* Body - zebra */
+/* Body - zebra (cell par color — bina !important taaki span[style] Jodit colors dikhein) */
 .product-description-tables table tbody tr td,
 .product-description-tables table tbody tr th,
 .product-description-tables table tr:nth-child(n+3) td,
 .product-description-tables table tr:nth-child(n+3) th {
-  color: #1e293b !important;
-  font-weight: 400 !important;
+  color: var(--pt-body-fg);
+  font-weight: 400;
 }
 .product-description-tables table tbody tr:nth-child(odd) td,
 .product-description-tables table tbody tr:nth-child(odd) th,
 .product-description-tables table tr:nth-child(odd):not(:first-child):not(:nth-child(2)) td,
 .product-description-tables table tr:nth-child(odd):not(:first-child):not(:nth-child(2)) th {
-  background-color: #f1f5f9 !important;
+  background-color: var(--pt-zebra-odd) !important;
 }
 .product-description-tables table tbody tr:nth-child(even) td,
 .product-description-tables table tbody tr:nth-child(even) th,
 .product-description-tables table tr:nth-child(even):not(:first-child):not(:nth-child(2)) td {
-  background-color: #ffffff !important;
+  background-color: var(--pt-zebra-even) !important;
 }
-.product-description-tables table tbody tr td *,
-.product-description-tables table tr:nth-child(n+3) td *,
-.product-description-tables table tr:nth-child(n+3) th * {
-  color: #1e293b !important;
-}
-
 /*
- * Zebra ke BAAD: Jodit rowspan — row1 <thead>, Inch/mm <tbody> ki pehli row.
- * Pehle is block ko zebra se pehle rakha tha; tbody:nth-child(odd) ne background override kar diya tha (local dev).
+ * Zebra ke BAAD: rowspan — pehli thead row, Inch/mm <tbody> ki pehli row.
+ * `+ tbody` mat use karo: <colgroup> beech mein aaye to adjacent fail ho jata hai — `~ tbody:first-of-type` use karo.
+ * `th * { color:white !important }` mat: Jodit span[style]=white + zebra white bg = text invisible.
  */
-.product-description-tables table thead:has(> tr:only-child) + tbody > tr:first-child th,
-.product-description-tables table thead:has(> tr:only-child) + tbody > tr:first-child td {
-  background-color: #1d43a4 !important;
-  background: #1d43a4 !important;
-  color: #ffffff !important;
+.product-description-tables table thead:has(> tr:only-child) ~ tbody:first-of-type > tr:first-child th,
+.product-description-tables table thead:has(> tr:only-child) ~ tbody:first-of-type > tr:first-child td {
+  background-color: var(--pt-header-bg) !important;
+  background: var(--pt-header-bg) !important;
+  color: var(--pt-header-fg) !important;
   font-weight: 700 !important;
 }
-.product-description-tables table thead:has(> tr:only-child) + tbody > tr:first-child th *,
-.product-description-tables table thead:has(> tr:only-child) + tbody > tr:first-child td * {
-  color: #ffffff !important;
+.product-description-tables table thead:has(> tr:only-child) ~ tbody:first-of-type > tr:first-child th [style],
+.product-description-tables table thead:has(> tr:only-child) ~ tbody:first-of-type > tr:first-child td [style] {
+  color: inherit !important;
 }
 
 /* Body rules ke baad header text phir se white (specificity) */

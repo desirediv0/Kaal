@@ -99,7 +99,7 @@ export default function EditProductPage({ params }) {
     toolbarStickyOffset: 100,
     askBeforePasteHTML: false,
     askBeforePasteFromWord: false,
-    defaultActionOnPaste: 'insert_clear_html',
+    defaultActionOnPaste: "insert_as_html",
     uploader: {
       insertImageAsBase64URI: true
     },

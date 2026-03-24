@@ -84,7 +84,8 @@ export default function AddProductPage() {
     toolbarStickyOffset: 100,
     askBeforePasteHTML: false,
     askBeforePasteFromWord: false,
-    defaultActionOnPaste: 'insert_clear_html',
+    /* Preserve colors/fonts/tables from Word & browser paste (matches storefront) */
+    defaultActionOnPaste: "insert_as_html",
     uploader: {
       insertImageAsBase64URI: true
     },
