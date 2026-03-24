@@ -370,14 +370,10 @@ export default function ProductPage() {
                 Description
               </h2>
             </div>
-            <div className="bg-gray-50 p-4  rounded-lg overflow-hidden">
+            <div className="bg-gray-50 p-4 rounded-lg overflow-hidden w-full">
               <div
-                className="overflow-x-auto prose prose-sm max-w-none
-                  prose-p:text-gray-500 prose-li:text-gray-500 prose-strong:text-gray-600
-                  prose-a:text-[var(--maincolor)] prose-headings:text-gray-600
-                  [&_table]:text-sm [&_table]:w-auto [&_th]:px-4 [&_th]:py-2 [&_th]:text-sm [&_th]:font-semibold
-                  [&_td]:px-4 [&_td]:py-2 [&_td]:text-gray-500 [&_td]:text-sm
-                  [&_table]:border-collapse [&_tr]:border-b [&_tr]:border-gray-200"
+                className="product-description-tables product-table-scroll w-full
+                  [&_p]:text-gray-500 [&_li]:text-gray-500 [&_a]:text-[var(--maincolor)] [&_h2]:text-gray-600 [&_h3]:text-gray-600"
                 dangerouslySetInnerHTML={{ __html: product.description }}
               />
             </div>

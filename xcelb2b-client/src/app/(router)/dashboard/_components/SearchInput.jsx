@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import axios from "axios";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,6 +10,8 @@ import { useAuth } from "../../../../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
+const DEBOUNCE_DELAY = 450;
+
 export function SearchComponent({ apiEndpoint, renderCard, placeholder }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
@@ -17,14 +19,21 @@ export function SearchComponent({ apiEndpoint, renderCard, placeholder }) {
   const [error, setError] = useState(null);
   const { checkAuth } = useAuth();
   const router = useRouter();
+  const abortControllerRef = useRef(null);
+  const requestIdRef = useRef(0);
 
   const searchItems = useCallback(
     async (searchQuery) => {
       if (searchQuery.trim() === "") {
         setResults([]);
         setError(null);
+        setIsLoading(false);
         return;
       }
+
+      abortControllerRef.current?.abort();
+      abortControllerRef.current = new AbortController();
+      const currentRequestId = ++requestIdRef.current;
 
       setIsLoading(true);
       setError(null);
@@ -36,26 +45,43 @@ export function SearchComponent({ apiEndpoint, renderCard, placeholder }) {
           return;
         }
         const response = await axios.get(
-          `${apiEndpoint}?q=${encodeURIComponent(searchQuery)}`
+          `${apiEndpoint}?q=${encodeURIComponent(searchQuery)}`,
+          { signal: abortControllerRef.current.signal }
         );
-        setResults(response.data.data);
+        if (currentRequestId === requestIdRef.current) {
+          setResults(response.data.data);
+        }
       } catch (err) {
-        setError("An error occurred while searching. Please try again.");
-        setResults([]);
+        if (axios.isCancel(err)) return;
+        if (currentRequestId === requestIdRef.current) {
+          setError("An error occurred while searching. Please try again.");
+          setResults([]);
+        }
       } finally {
-        setIsLoading(false);
+        if (currentRequestId === requestIdRef.current) {
+          setIsLoading(false);
+        }
       }
     },
     [apiEndpoint, checkAuth, router]
   );
 
-  const debouncedSearch = useCallback(debounce(searchItems, 300), [
-    searchItems,
-  ]);
+  const searchItemsRef = useRef(searchItems);
+  searchItemsRef.current = searchItems;
+
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((q) => searchItemsRef.current(q), DEBOUNCE_DELAY, {
+        leading: false,
+        trailing: true,
+      }),
+    []
+  );
 
   useEffect(() => {
     return () => {
       debouncedSearch.cancel();
+      abortControllerRef.current?.abort();
     };
   }, [debouncedSearch]);
 

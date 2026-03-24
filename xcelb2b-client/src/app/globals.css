@@ -96,3 +96,41 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Jodit editor - table style (blue header, sub-header white, borders, zebra) */
+.jodit-wysiwyg table {
+  border-collapse: collapse;
+  width: 100%;
+  border: 1px solid #cbd5e1;
+}
+.jodit-wysiwyg table th,
+.jodit-wysiwyg table td {
+  border: 1px solid #cbd5e1;
+  padding: 10px 12px;
+  text-align: center;
+  font-size: 13px;
+}
+.jodit-wysiwyg table tr:first-child th,
+.jodit-wysiwyg table tr:first-child td,
+.jodit-wysiwyg table thead tr:first-child th,
+.jodit-wysiwyg table thead tr:first-child td {
+  background-color: #1d43a4 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+.jodit-wysiwyg table tr:first-child th *,
+.jodit-wysiwyg table tr:first-child td * {
+  color: #ffffff !important;
+}
+.jodit-wysiwyg table tr:nth-child(2) th,
+.jodit-wysiwyg table tr:nth-child(2) td {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+  font-weight: 700 !important;
+}
+.jodit-wysiwyg table tbody tr:nth-child(odd) td {
+  background-color: #f1f5f9;
+}
+.jodit-wysiwyg table tbody tr:nth-child(even) td {
+  background-color: #ffffff;
+}

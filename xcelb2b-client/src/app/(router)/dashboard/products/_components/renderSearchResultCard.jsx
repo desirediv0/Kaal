@@ -14,7 +14,7 @@ const RenderSearchResultCard = ({ product, handleDelete }) => {
         <div className="flex-shrink-0 mr-4">
           {image ? (
             <Image
-              src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${image}`}
+              src={`${image}`}
               alt={title}
               width={60}
               height={60}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import axios from "axios";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -146,19 +146,47 @@ export default function Categories({
   });
 
   useEffect(() => {
-    const initializeCategories = async () => {
-      await loadCategories();
-      if (initialSelectedCategories.length === 0) {
-        const uncategorized = categories.find(
-          (c) => c.name.toLowerCase() === "uncategorized"
-        );
-        if (uncategorized) {
-          setSelectedCategories([uncategorized.id]);
-        }
-      }
-    };
-    initializeCategories();
+    loadCategories();
   }, []);
+
+  // Sync only when parent explicitly passes initial values (Edit page) - skip when undefined (Add page)
+  const prevInitialRef = useRef({ cat: "", sub: "" });
+  const hasInitialCategories = initialSelectedCategories !== undefined;
+  const hasInitialSubCategories = initialSelectedSubCategories !== undefined;
+
+  useEffect(() => {
+    if (!hasInitialCategories && !hasInitialSubCategories) return;
+
+    const catKey = hasInitialCategories ? JSON.stringify(initialSelectedCategories) : "";
+    const subKey = hasInitialSubCategories ? JSON.stringify(initialSelectedSubCategories) : "";
+
+    if (hasInitialCategories && catKey !== prevInitialRef.current.cat) {
+      prevInitialRef.current.cat = catKey;
+      setSelectedCategories(Array.isArray(initialSelectedCategories) ? initialSelectedCategories : []);
+    }
+    if (hasInitialSubCategories && subKey !== prevInitialRef.current.sub) {
+      prevInitialRef.current.sub = subKey;
+      setSelectedSubCategories(Array.isArray(initialSelectedSubCategories) ? initialSelectedSubCategories : []);
+    }
+  }, [hasInitialCategories, hasInitialSubCategories, initialSelectedCategories, initialSelectedSubCategories]);
+
+  // Only set uncategorized default on Add page when no initial values passed
+  useEffect(() => {
+    if (
+      !loading &&
+      categories.length > 0 &&
+      !hasInitialCategories &&
+      selectedCategories.length === 0
+    ) {
+      const uncategorized = categories.find(
+        (c) => c.name?.toLowerCase() === "uncategorized"
+      );
+      if (uncategorized) {
+        setSelectedCategories([uncategorized.id]);
+        if (onCategoryChange) onCategoryChange([uncategorized.id]);
+      }
+    }
+  }, [loading, categories, hasInitialCategories, selectedCategories.length]);
 
   const loadCategories = async () => {
     setLoading(true);
@@ -260,51 +288,40 @@ export default function Categories({
         newSelection = prev.filter((id) => id !== subCategoryId);
 
         // If no subcategories selected for this category, remove category selection
-        const hasOtherSubcategories = prev.some((id) => {
-          const category = categories.find((c) =>
-            c.subCategories?.some((sc) => sc.id === id)
-          );
-          return category?.id === categoryId;
-        });
+        const categorySubIds =
+          categories.find((c) => c.id === categoryId)?.subCategories?.map(
+            (sc) => sc.id
+          ) || [];
+        const hasOtherSubcategories = newSelection.some((id) =>
+          categorySubIds.includes(id)
+        );
 
         if (!hasOtherSubcategories) {
-          setSelectedCategories((prev) =>
-            prev.filter((id) => id !== categoryId)
-          );
+          setSelectedCategories((prevCats) => {
+            const newCats = prevCats.filter((id) => id !== categoryId);
+            if (onCategoryChange) onCategoryChange(newCats);
+            return newCats;
+          });
         }
       } else {
-        // Remove Uncategorized if it's selected
-        setSelectedCategories((prev) => {
+        // Remove Uncategorized and add parent category
+        setSelectedCategories((prevCats) => {
           const uncategorized = categories.find(
-            (c) => c.name.toLowerCase() === "uncategorized"
+            (c) => c.name?.toLowerCase() === "uncategorized"
           );
-          let newCats = prev.filter((id) => id !== uncategorized?.id);
-
-          // Add parent category if not already selected
+          let newCats = prevCats.filter((id) => id !== uncategorized?.id);
           if (!newCats.includes(categoryId)) {
             newCats = [...newCats, categoryId];
           }
-
-          // Notify parent about category changes
-          if (onCategoryChange) {
-            const selectedCategoryObjects = categories.filter((c) =>
-              newCats.includes(c.id)
-            );
-            onCategoryChange(selectedCategoryObjects);
-          }
-
+          if (onCategoryChange) onCategoryChange(newCats);
           return newCats;
         });
-
         newSelection.push(subCategoryId);
       }
 
-      // Notify parent about subcategory changes
+      // Notify parent about subcategory changes (pass IDs for consistency)
       if (onSubCategoryChange) {
-        const selectedSubCategoryObjects = categories
-          .flatMap((c) => c.subCategories)
-          .filter((sc) => newSelection.includes(sc.id));
-        onSubCategoryChange(selectedSubCategoryObjects);
+        onSubCategoryChange(newSelection);
       }
 
       return newSelection;

@@ -197,6 +197,115 @@
   max-width: 220px;
 }
 
+/* Product description - scroll container for responsive (chhota/bada dono fit) */
+.product-table-scroll {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #94a3b8 transparent;
+}
+.product-table-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+.product-table-scroll::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+.product-table-scroll::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 4px;
+}
+.product-table-scroll::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* Product tables - BLUE header (Jodit), borders - prose conflict fix */
+.product-description-tables table {
+  border: 1px solid #94a3b8 !important;
+  border-collapse: collapse !important;
+  width: 100% !important;
+  min-width: 320px !important;
+  font-size: 13px !important;
+  table-layout: auto !important;
+}
+@media (min-width: 768px) {
+  .product-description-tables table {
+    font-size: 14px !important;
+  }
+}
+.product-description-tables table th,
+.product-description-tables table td {
+  border: 1px solid #94a3b8 !important;
+  padding: 10px 12px !important;
+  text-align: center !important;
+  font-size: inherit !important;
+  word-wrap: break-word !important;
+}
+
+/* HEADER - deep blue bg, white text (sabse upar) */
+.product-description-tables table thead tr:first-child th,
+.product-description-tables table thead tr:first-child td,
+.product-description-tables table tbody:first-child tr:first-child th,
+.product-description-tables table tbody:first-child tr:first-child td,
+.product-description-tables table tr:first-child th,
+.product-description-tables table tr:first-child td {
+  background-color: #1d43a4 !important;
+  background: #1d43a4 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+.product-description-tables table thead tr:first-child th *,
+.product-description-tables table thead tr:first-child td *,
+.product-description-tables table tr:first-child th *,
+.product-description-tables table tr:first-child td * {
+  color: #ffffff !important;
+}
+
+/* Sub-header (Inch, mm) - light bg, dark text */
+.product-description-tables table thead tr:nth-child(2) th,
+.product-description-tables table thead tr:nth-child(2) td,
+.product-description-tables table tr:nth-child(2) th,
+.product-description-tables table tr:nth-child(2) td {
+  background-color: #f8fafc !important;
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  font-weight: 700 !important;
+}
+.product-description-tables table thead tr:nth-child(2) th *,
+.product-description-tables table thead tr:nth-child(2) td *,
+.product-description-tables table tr:nth-child(2) th *,
+.product-description-tables table tr:nth-child(2) td * {
+  color: #0f172a !important;
+}
+
+/* Body - zebra */
+.product-description-tables table tbody tr td,
+.product-description-tables table tbody tr th,
+.product-description-tables table tr:nth-child(n+3) td,
+.product-description-tables table tr:nth-child(n+3) th {
+  color: #1e293b !important;
+  font-weight: 400 !important;
+}
+.product-description-tables table tbody tr:nth-child(odd) td,
+.product-description-tables table tbody tr:nth-child(odd) th,
+.product-description-tables table tr:nth-child(odd):not(:first-child):not(:nth-child(2)) td,
+.product-description-tables table tr:nth-child(odd):not(:first-child):not(:nth-child(2)) th {
+  background-color: #f1f5f9 !important;
+}
+.product-description-tables table tbody tr:nth-child(even) td,
+.product-description-tables table tbody tr:nth-child(even) th,
+.product-description-tables table tr:nth-child(even):not(:first-child):not(:nth-child(2)) td {
+  background-color: #ffffff !important;
+}
+.product-description-tables table tbody tr td *,
+.product-description-tables table tr:nth-child(n+3) td *,
+.product-description-tables table tr:nth-child(n+3) th * {
+  color: #1e293b !important;
+}
+
 /* Table container for horizontal scroll on mobile */
 .table-container {
   overflow-x: auto;

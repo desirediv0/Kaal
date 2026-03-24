@@ -213,29 +213,13 @@ export default function AddProductPage() {
       if (seoTitle) formData.append("seoTitle", seoTitle);
       if (seoDesc) formData.append("seoDesc", seoDesc);
 
-      // Handle categories
-      if (categories.length > 0) {
-        categories.forEach(categoryId => {
-          formData.append("categoryIds[]", categoryId);
-        });
-      }
-
-      // Handle subcategories  
-      if (subCategories.length > 0) {
-        subCategories.forEach(subCategoryId => {
-          formData.append("subCategoryIds[]", subCategoryId);
-        });
-      }
+      // Send category/subcategory as JSON - FormData doesn't reliably pass arrays
+      formData.append("categoryIds", JSON.stringify(categories));
+      formData.append("subCategoryIds", JSON.stringify(subCategories));
 
       // Additional images
       additionalImages.forEach(image => {
         formData.append("images", image);
-      });
-
-      console.log('Debug - Form Data:', {
-        categories,
-        subCategories,
-        formDataEntries: Array.from(formData.entries())
       });
 
       const { data } = await axios.post(

@@ -197,6 +197,8 @@ export const deleteLead = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "Lead deleted successfully"));
 });
 
+const SEARCH_RESULT_LIMIT = 25;
+
 export const searchLeads = asyncHandler(async (req, res) => {
   const { q } = req.query;
 
@@ -212,8 +214,10 @@ export const searchLeads = asyncHandler(async (req, res) => {
         { phone: { contains: q, mode: "insensitive" } },
         { message: { contains: q, mode: "insensitive" } },
         { slug: { contains: q, mode: "insensitive" } },
+        { subject: { contains: q, mode: "insensitive" } },
       ],
     },
+    take: SEARCH_RESULT_LIMIT,
     include: { comments: true },
   });
 

@@ -100,18 +100,18 @@ export const createProducts = asyncHandler(async (req, res) => {
     throw new ApiError(404, "User not found");
   }
 
-  // Parse and validate categories
+  // Parse categoryIds - handle JSON string from FormData, array, or object
   if (typeof categoryIds === "string") {
-    categoryIds = [categoryIds];
+    try {
+      categoryIds = JSON.parse(categoryIds);
+    } catch {
+      categoryIds = [categoryIds];
+    }
   }
-
-  // Convert to array if needed
   if (!Array.isArray(categoryIds)) {
     categoryIds = Object.values(categoryIds || {});
   }
-
-  // Filter valid UUID format
-  categoryIds = categoryIds.filter(
+  categoryIds = (categoryIds || []).filter(
     (id) =>
       typeof id === "string" &&
       /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
@@ -140,15 +140,19 @@ export const createProducts = asyncHandler(async (req, res) => {
     throw new ApiError(404, "No valid categories found");
   }
 
-  // Handle subcategories (optional)
+  // Handle subcategories (optional) - parse JSON string from FormData
   let validSubCategoryIds = [];
-  if (subCategoryIds && subCategoryIds.length > 0) {
-    // Convert to array if needed
+  if (subCategoryIds) {
+    if (typeof subCategoryIds === "string") {
+      try {
+        subCategoryIds = JSON.parse(subCategoryIds);
+      } catch {
+        subCategoryIds = [subCategoryIds];
+      }
+    }
     if (!Array.isArray(subCategoryIds)) {
       subCategoryIds = Object.values(subCategoryIds || {});
     }
-
-    // Filter valid UUIDs
     subCategoryIds = subCategoryIds.filter(
       (id) =>
         typeof id === "string" &&
@@ -266,28 +270,46 @@ export const updateProduct = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Product not found");
   }
 
-  // Parse category IDs with better handling
+  // Parse category IDs - handles JSON string (FormData), array, or categoryIds[]
   let categoryIds = [];
-  if (req.body.categoryIds || req.body["categoryIds[]"]) {
-    categoryIds = Array.isArray(
-      req.body.categoryIds || req.body["categoryIds[]"]
-    )
-      ? req.body.categoryIds || req.body["categoryIds[]"]
-      : [req.body.categoryIds || req.body["categoryIds[]"]];
-
-    categoryIds = categoryIds.map((id) => id.toString()).filter(Boolean);
+  const rawCategoryIds =
+    req.body.categoryIds || req.body["categoryIds[]"];
+  if (rawCategoryIds) {
+    if (typeof rawCategoryIds === "string") {
+      try {
+        categoryIds = JSON.parse(rawCategoryIds);
+      } catch {
+        categoryIds = rawCategoryIds.includes(",")
+          ? rawCategoryIds.split(",").map((s) => s.trim())
+          : [rawCategoryIds];
+      }
+    } else if (Array.isArray(rawCategoryIds)) {
+      categoryIds = rawCategoryIds;
+    } else {
+      categoryIds = [rawCategoryIds];
+    }
+    categoryIds = categoryIds.map((id) => String(id)).filter(Boolean);
   }
 
-  // Parse subcategory IDs with better handling
+  // Parse subcategory IDs - same handling
   let subCategoryIds = [];
-  if (req.body.subCategoryIds || req.body["subCategoryIds[]"]) {
-    subCategoryIds = Array.isArray(
-      req.body.subCategoryIds || req.body["subCategoryIds[]"]
-    )
-      ? req.body.subCategoryIds || req.body["subCategoryIds[]"]
-      : [req.body.subCategoryIds || req.body["subCategoryIds[]"]];
-
-    subCategoryIds = subCategoryIds.map((id) => id.toString()).filter(Boolean);
+  const rawSubCategoryIds =
+    req.body.subCategoryIds || req.body["subCategoryIds[]"];
+  if (rawSubCategoryIds) {
+    if (typeof rawSubCategoryIds === "string") {
+      try {
+        subCategoryIds = JSON.parse(rawSubCategoryIds);
+      } catch {
+        subCategoryIds = rawSubCategoryIds.includes(",")
+          ? rawSubCategoryIds.split(",").map((s) => s.trim())
+          : [rawSubCategoryIds];
+      }
+    } else if (Array.isArray(rawSubCategoryIds)) {
+      subCategoryIds = rawSubCategoryIds;
+    } else {
+      subCategoryIds = [rawSubCategoryIds];
+    }
+    subCategoryIds = subCategoryIds.map((id) => String(id)).filter(Boolean);
   }
 
   // Get uncategorized if no categories selected
@@ -635,6 +657,8 @@ export const deleteProduct = asyncHandler(async (req, res) => {
     throw new ApiError(500, `Failed to delete product: ${error.message}`);
   }
 });
+const SEARCH_RESULT_LIMIT = 25;
+
 export const searchProducts = asyncHandler(async (req, res) => {
   const { q } = req.query;
 
@@ -648,17 +672,19 @@ export const searchProducts = asyncHandler(async (req, res) => {
         OR: [
           { title: { contains: q, mode: "insensitive" } },
           { description: { contains: q, mode: "insensitive" } },
+          { shortDesc: { contains: q, mode: "insensitive" } },
         ],
       },
+      take: SEARCH_RESULT_LIMIT,
       include: {
         categories: {
           include: {
-            category: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
+            category: { select: { id: true, name: true } },
+          },
+        },
+        subCategories: {
+          include: {
+            subCategory: { select: { id: true, name: true } },
           },
         },
         images: true,

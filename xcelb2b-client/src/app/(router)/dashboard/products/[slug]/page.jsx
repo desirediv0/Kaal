@@ -299,21 +299,9 @@ export default function EditProductPage({ params }) {
         }
       })
 
-      // Always send categories array
-      selectedCategories.forEach(categoryId => {
-        formData.append('categoryIds[]', categoryId)
-      })
-
-      // Always send subcategories array
-      selectedSubCategories.forEach(subCategoryId => {
-        formData.append('subCategoryIds[]', subCategoryId)
-      })
-
-      console.log('Debug - FormData:', {
-        categories: selectedCategories,
-        subCategories: selectedSubCategories,
-        formDataEntries: Array.from(formData.entries())
-      })
+      // Send as JSON strings - FormData doesn't reliably pass arrays with multiple append
+      formData.append('categoryIds', JSON.stringify(selectedCategories))
+      formData.append('subCategoryIds', JSON.stringify(selectedSubCategories))
 
       const response = await axios.put(
         `${process.env.NEXT_PUBLIC_API_URL}/product/${params.slug}`,
