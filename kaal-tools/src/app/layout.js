@@ -40,6 +40,9 @@ const BankGothic = localFont({
 export const metadata = {
   title: "Kaal Tools",
   description: "Products",
+  verification: {
+    google: "mqKWxoZ5e2TJmqOEJBh6bzB7Lhczpej5Aajr3LszeLw",
+  },
 };
 
 export default function RootLayout({ children }) {
