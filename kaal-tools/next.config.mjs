@@ -1,6 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-images: {
+  transpilePackages: ["react-icons"],
+  experimental: {
+    optimizePackageImports: ["react-icons"],
+  },
+  images: {
     remotePatterns: [
       {
         protocol: "https",

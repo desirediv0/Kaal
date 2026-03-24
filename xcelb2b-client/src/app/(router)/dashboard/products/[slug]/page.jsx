@@ -285,8 +285,9 @@ export default function EditProductPage({ params }) {
       formData.append("price", regularPrice)
       formData.append("salePrice", salePrice)
       formData.append("description", description)
-      formData.append("seoTitle", seoTitle)
-      formData.append("seoDesc", seoDesc)
+      // SEO - when empty, backend will use title/description
+      formData.append("seoTitle", seoTitle?.trim() || "")
+      formData.append("seoDesc", seoDesc?.trim() || "")
 
       // Handle images
       if (thumbnail) {
@@ -554,6 +555,8 @@ export default function EditProductPage({ params }) {
               seoDesc={seoDesc}
               onSeoTitleChange={setSeoTitle}
               onSeoDescChange={setSeoDesc}
+              productName={productName}
+              description={description}
             />
           </form>
         </CardContent>

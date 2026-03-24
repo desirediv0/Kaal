@@ -210,8 +210,9 @@ export default function AddProductPage() {
       // Optional fields
       if (regularPrice) formData.append("price", regularPrice);
       if (salePrice) formData.append("salePrice", salePrice);
-      if (seoTitle) formData.append("seoTitle", seoTitle);
-      if (seoDesc) formData.append("seoDesc", seoDesc);
+      // SEO - when empty, backend will use title/description
+      formData.append("seoTitle", seoTitle?.trim() || "");
+      formData.append("seoDesc", seoDesc?.trim() || "");
 
       // Send category/subcategory as JSON - FormData doesn't reliably pass arrays
       formData.append("categoryIds", JSON.stringify(categories));
@@ -416,6 +417,8 @@ export default function AddProductPage() {
               seoDesc={seoDesc}
               onSeoTitleChange={setSeoTitle}
               onSeoDescChange={setSeoDesc}
+              productName={productName}
+              description={description}
             />
           </CardContent>
         </Card>

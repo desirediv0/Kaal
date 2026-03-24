@@ -105,7 +105,7 @@ export const createLead = asyncHandler(async (req, res) => {
     phone: phone?.trim(),
     message: message.trim(),
     slug,
-    subject: subject ? await generateUniqueSlug(null, subject) : "No Subject",
+    subject: subject && String(subject).trim() ? String(subject).trim() : "No Subject",
   });
 
   return res

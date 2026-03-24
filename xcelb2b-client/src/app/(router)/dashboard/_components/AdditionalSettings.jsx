@@ -4,11 +4,19 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ChevronDown } from "lucide-react";
 
+const stripHtmlForMeta = (html) => {
+  if (!html) return "";
+  const clean = String(html).replace(/<[^>]*>/g, "").replace(/[^\w\s]/g, " ").replace(/\s+/g, " ").trim();
+  return clean.length > 160 ? clean.substring(0, 160) + "..." : clean;
+};
+
 const AdditionalSettings = ({
   seoTitle = "",
   seoDesc = "",
   onSeoTitleChange = () => {},
   onSeoDescChange = () => {},
+  productName = "",
+  description = "",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const contentRef = useRef(null);
@@ -52,7 +60,7 @@ const AdditionalSettings = ({
             <Label htmlFor="seoTitle">SEO Title</Label>
             <Input
               id="seoTitle"
-              placeholder="Enter SEO title"
+              placeholder={productName || "Enter SEO title"}
               value={seoTitle}
               onChange={(e) => onSeoTitleChange(e.target.value)}
             />
@@ -61,7 +69,7 @@ const AdditionalSettings = ({
             <Label htmlFor="seoDesc">Meta Description</Label>
             <Textarea
               id="seoDesc"
-              placeholder="Enter meta description"
+              placeholder={stripHtmlForMeta(description) || "Enter meta description"}
               value={seoDesc}
               onChange={(e) => onSeoDescChange(e.target.value)}
             />

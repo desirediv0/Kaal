@@ -360,14 +360,11 @@ export const updateProduct = asyncHandler(async (req, res) => {
     updateFields.shortDesc = shortDesc.trim();
   }
 
-  // SEO fields
-  if (seoTitle && seoTitle !== product.seoTitle) {
-    updateFields.seoTitle = seoTitle.trim();
-  }
-
-  if (seoDesc && seoDesc !== product.seoDesc) {
-    updateFields.seoDesc = seoDesc.trim();
-  }
+  // SEO fields - fallback to title/description when empty
+  const finalSeoTitle = (seoTitle && seoTitle.trim()) ? seoTitle.trim() : (title || product.title);
+  const finalSeoDesc = (seoDesc && seoDesc.trim()) ? seoDesc.trim() : createMetaDescription(description || product.description);
+  updateFields.seoTitle = finalSeoTitle;
+  updateFields.seoDesc = finalSeoDesc;
 
   // Price validation
   if (price !== undefined) {
