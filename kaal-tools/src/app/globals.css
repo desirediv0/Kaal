@@ -245,9 +245,22 @@
   word-wrap: break-word !important;
 }
 
-/* HEADER - deep blue bg, white text (sabse upar) */
-.product-description-tables table thead tr:first-child th,
-.product-description-tables table thead tr:first-child td,
+/* HEADER - saari <thead> rows (Code/Taper + Inch/mm) same blue */
+.product-description-tables table thead th,
+.product-description-tables table thead td {
+  background-color: #1d43a4 !important;
+  background: #1d43a4 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+.product-description-tables table thead th *,
+.product-description-tables table thead td * {
+  color: #ffffff !important;
+}
+
+/* <thead> ke bina: pehli row = main header */
+.product-description-tables table:not(:has(thead)) > tbody > tr:first-child th,
+.product-description-tables table:not(:has(thead)) > tbody > tr:first-child td,
 .product-description-tables table tbody:first-child tr:first-child th,
 .product-description-tables table tbody:first-child tr:first-child td,
 .product-description-tables table tr:first-child th,
@@ -257,28 +270,21 @@
   color: #ffffff !important;
   font-weight: 700 !important;
 }
-.product-description-tables table thead tr:first-child th *,
-.product-description-tables table thead tr:first-child td *,
+.product-description-tables table:not(:has(thead)) > tbody > tr:first-child th *,
+.product-description-tables table:not(:has(thead)) > tbody > tr:first-child td *,
 .product-description-tables table tr:first-child th *,
 .product-description-tables table tr:first-child td * {
   color: #ffffff !important;
 }
 
-/* Sub-header (Inch, mm) - light bg, dark text */
-.product-description-tables table thead tr:nth-child(2) th,
-.product-description-tables table thead tr:nth-child(2) td,
-.product-description-tables table tr:nth-child(2) th,
-.product-description-tables table tr:nth-child(2) td {
-  background-color: #f8fafc !important;
-  background: #f8fafc !important;
-  color: #0f172a !important;
+/* <thead> ke bina: doosri row sub-header (Inch/mm) sirf jab cells <th> hon — same blue */
+.product-description-tables table:not(:has(thead)) > tbody > tr:nth-child(2) th {
+  background-color: #1d43a4 !important;
+  color: #ffffff !important;
   font-weight: 700 !important;
 }
-.product-description-tables table thead tr:nth-child(2) th *,
-.product-description-tables table thead tr:nth-child(2) td *,
-.product-description-tables table tr:nth-child(2) th *,
-.product-description-tables table tr:nth-child(2) td * {
-  color: #0f172a !important;
+.product-description-tables table:not(:has(thead)) > tbody > tr:nth-child(2) th * {
+  color: #ffffff !important;
 }
 
 /* Body - zebra */
@@ -304,6 +310,40 @@
 .product-description-tables table tr:nth-child(n+3) td *,
 .product-description-tables table tr:nth-child(n+3) th * {
   color: #1e293b !important;
+}
+
+/*
+ * Zebra ke BAAD: Jodit rowspan — row1 <thead>, Inch/mm <tbody> ki pehli row.
+ * Pehle is block ko zebra se pehle rakha tha; tbody:nth-child(odd) ne background override kar diya tha (local dev).
+ */
+.product-description-tables table thead:has(> tr:only-child) + tbody > tr:first-child th,
+.product-description-tables table thead:has(> tr:only-child) + tbody > tr:first-child td {
+  background-color: #1d43a4 !important;
+  background: #1d43a4 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+.product-description-tables table thead:has(> tr:only-child) + tbody > tr:first-child th *,
+.product-description-tables table thead:has(> tr:only-child) + tbody > tr:first-child td * {
+  color: #ffffff !important;
+}
+
+/* Body rules ke baad header text phir se white (specificity) */
+.product-description-tables table thead th,
+.product-description-tables table thead td,
+.product-description-tables table thead th *,
+.product-description-tables table thead td * {
+  color: #ffffff !important;
+}
+.product-description-tables table:not(:has(thead)) > tbody > tr:first-child th,
+.product-description-tables table:not(:has(thead)) > tbody > tr:first-child td,
+.product-description-tables table:not(:has(thead)) > tbody > tr:first-child th *,
+.product-description-tables table:not(:has(thead)) > tbody > tr:first-child td * {
+  color: #ffffff !important;
+}
+.product-description-tables table:not(:has(thead)) > tbody > tr:nth-child(2) th,
+.product-description-tables table:not(:has(thead)) > tbody > tr:nth-child(2) th * {
+  color: #ffffff !important;
 }
 
 /* Table container for horizontal scroll on mobile */
