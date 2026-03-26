@@ -178,13 +178,13 @@
 
 /* Reduce paragraph spacing inside prose */
 .prose p {
-  margin-top: 0.20em !important;
-  margin-bottom: 0.20em !important;
+  margin-top: 0.2em !important;
+  margin-bottom: 0.2em !important;
 }
 
 .prose :where(p):not(:where([class~="not-prose"] *)) {
-  margin-top: 0.20em !important;
-  margin-bottom: 0.20em !important;
+  margin-top: 0.2em !important;
+  margin-bottom: 0.2em !important;
 }
 
 .prose :where(td):not(:where([class~="not-prose"] *)) {
@@ -222,6 +222,11 @@
   background: #64748b;
 }
 
+.product-html-from-editor {
+  font-size: unset;
+  font-family: unset;
+}
+
 /* Jodit HTML: paragraphs/lists — readable, store theme */
 .product-html-from-editor > p,
 .product-html-from-editor p {
@@ -244,13 +249,11 @@
 .product-html-from-editor h3,
 .product-html-from-editor h4 {
   margin: 0.85em 0 0.45em;
-  font-weight: 600;
   color: #1e293b;
   letter-spacing: -0.01em;
 }
 .product-html-from-editor strong,
 .product-html-from-editor b {
-  font-weight: 600;
   color: #0f172a;
 }
 
@@ -271,26 +274,27 @@
   border: 1px solid var(--pt-border) !important;
   border-collapse: collapse !important;
   width: 100% !important;
-  min-width: 320px !important;
+  min-width: 300px !important;
   max-width: 100% !important;
   table-layout: auto !important;
-  font-size: 15px !important;
+  /* Let Jodit inline styles + cell-level font sizes win (no !important) */
+  font-size: inherit;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
 }
 @media (min-width: 768px) {
   .product-description-tables table {
-    font-size: 16px !important;
+    font-size: inherit;
   }
 }
 .product-description-tables table th,
 .product-description-tables table td {
   border: 1px solid var(--pt-border) !important;
-  padding: 14px 16px !important;
-  min-height: 48px !important;
+  padding: 10px 16px !important;
+  min-height: 35px !important;
   box-sizing: border-box !important;
   text-align: center !important;
   vertical-align: middle !important;
-  line-height: 1.5 !important;
+  line-height: 1.2 !important;
   word-wrap: break-word !important;
   overflow-wrap: break-word !important;
   hyphens: auto;
@@ -302,7 +306,7 @@
   background-color: var(--pt-header-bg) !important;
   background: var(--pt-header-bg) !important;
   color: var(--pt-header-fg) !important;
-  font-weight: 700 !important;
+  font-weight: inherit;
 }
 .product-description-tables table thead th *,
 .product-description-tables table thead td * {
@@ -319,42 +323,70 @@
   background-color: var(--pt-header-bg) !important;
   background: var(--pt-header-bg) !important;
   color: var(--pt-header-fg) !important;
-  font-weight: 700 !important;
+  font-weight: inherit;
 }
-.product-description-tables table:not(:has(thead)) > tbody > tr:first-child th *,
-.product-description-tables table:not(:has(thead)) > tbody > tr:first-child td *,
+.product-description-tables
+  table:not(:has(thead))
+  > tbody
+  > tr:first-child
+  th
+  *,
+.product-description-tables
+  table:not(:has(thead))
+  > tbody
+  > tr:first-child
+  td
+  *,
 .product-description-tables table tr:first-child th *,
 .product-description-tables table tr:first-child td * {
   color: #ffffff !important;
 }
 
 /* <thead> ke bina: doosri row sub-header (Inch/mm) sirf jab cells <th> hon — same blue */
-.product-description-tables table:not(:has(thead)) > tbody > tr:nth-child(2) th {
+.product-description-tables
+  table:not(:has(thead))
+  > tbody
+  > tr:nth-child(2)
+  th {
   background-color: var(--pt-header-bg) !important;
   color: var(--pt-header-fg) !important;
-  font-weight: 700 !important;
+  font-weight: inherit;
 }
-.product-description-tables table:not(:has(thead)) > tbody > tr:nth-child(2) th * {
+.product-description-tables
+  table:not(:has(thead))
+  > tbody
+  > tr:nth-child(2)
+  th
+  * {
   color: #ffffff !important;
 }
 
 /* Body - zebra (cell par color — bina !important taaki span[style] Jodit colors dikhein) */
 .product-description-tables table tbody tr td,
 .product-description-tables table tbody tr th,
-.product-description-tables table tr:nth-child(n+3) td,
-.product-description-tables table tr:nth-child(n+3) th {
+.product-description-tables table tr:nth-child(n + 3) td,
+.product-description-tables table tr:nth-child(n + 3) th {
   color: var(--pt-body-fg);
-  font-weight: 400;
+  font-weight: inherit;
 }
 .product-description-tables table tbody tr:nth-child(odd) td,
 .product-description-tables table tbody tr:nth-child(odd) th,
-.product-description-tables table tr:nth-child(odd):not(:first-child):not(:nth-child(2)) td,
-.product-description-tables table tr:nth-child(odd):not(:first-child):not(:nth-child(2)) th {
+.product-description-tables
+  table
+  tr:nth-child(odd):not(:first-child):not(:nth-child(2))
+  td,
+.product-description-tables
+  table
+  tr:nth-child(odd):not(:first-child):not(:nth-child(2))
+  th {
   background-color: var(--pt-zebra-odd) !important;
 }
 .product-description-tables table tbody tr:nth-child(even) td,
 .product-description-tables table tbody tr:nth-child(even) th,
-.product-description-tables table tr:nth-child(even):not(:first-child):not(:nth-child(2)) td {
+.product-description-tables
+  table
+  tr:nth-child(even):not(:first-child):not(:nth-child(2))
+  td {
   background-color: var(--pt-zebra-even) !important;
 }
 /*
@@ -362,15 +394,37 @@
  * `+ tbody` mat use karo: <colgroup> beech mein aaye to adjacent fail ho jata hai — `~ tbody:first-of-type` use karo.
  * `th * { color:white !important }` mat: Jodit span[style]=white + zebra white bg = text invisible.
  */
-.product-description-tables table thead:has(> tr:only-child) ~ tbody:first-of-type > tr:first-child th,
-.product-description-tables table thead:has(> tr:only-child) ~ tbody:first-of-type > tr:first-child td {
+.product-description-tables
+  table
+  thead:has(> tr:only-child)
+  ~ tbody:first-of-type
+  > tr:first-child
+  th,
+.product-description-tables
+  table
+  thead:has(> tr:only-child)
+  ~ tbody:first-of-type
+  > tr:first-child
+  td {
   background-color: var(--pt-header-bg) !important;
   background: var(--pt-header-bg) !important;
   color: var(--pt-header-fg) !important;
-  font-weight: 700 !important;
+  font-weight: inherit;
 }
-.product-description-tables table thead:has(> tr:only-child) ~ tbody:first-of-type > tr:first-child th [style],
-.product-description-tables table thead:has(> tr:only-child) ~ tbody:first-of-type > tr:first-child td [style] {
+.product-description-tables
+  table
+  thead:has(> tr:only-child)
+  ~ tbody:first-of-type
+  > tr:first-child
+  th
+  [style],
+.product-description-tables
+  table
+  thead:has(> tr:only-child)
+  ~ tbody:first-of-type
+  > tr:first-child
+  td
+  [style] {
   color: inherit !important;
 }
 
@@ -383,12 +437,27 @@
 }
 .product-description-tables table:not(:has(thead)) > tbody > tr:first-child th,
 .product-description-tables table:not(:has(thead)) > tbody > tr:first-child td,
-.product-description-tables table:not(:has(thead)) > tbody > tr:first-child th *,
-.product-description-tables table:not(:has(thead)) > tbody > tr:first-child td * {
+.product-description-tables
+  table:not(:has(thead))
+  > tbody
+  > tr:first-child
+  th
+  *,
+.product-description-tables
+  table:not(:has(thead))
+  > tbody
+  > tr:first-child
+  td
+  * {
   color: #ffffff !important;
 }
 .product-description-tables table:not(:has(thead)) > tbody > tr:nth-child(2) th,
-.product-description-tables table:not(:has(thead)) > tbody > tr:nth-child(2) th * {
+.product-description-tables
+  table:not(:has(thead))
+  > tbody
+  > tr:nth-child(2)
+  th
+  * {
   color: #ffffff !important;
 }
 

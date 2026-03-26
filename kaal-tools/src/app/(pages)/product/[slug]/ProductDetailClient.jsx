@@ -203,9 +203,8 @@ export default function ProductDetailClient({ initialProduct }) {
                     <CarouselItem key={index} className="basis-1/3">
                       <div className="p-1">
                         <Card
-                          className={`hover:shadow-md transition-all duration-300 cursor-pointer ${
-                            mainImage === image ? "ring-2 ring-[var(--maincolor)]" : ""
-                          }`}
+                          className={`hover:shadow-md transition-all duration-300 cursor-pointer ${mainImage === image ? "ring-2 ring-[var(--maincolor)]" : ""
+                            }`}
                         >
                           <CardContent className="flex aspect-square relative p-0">
                             <Image
@@ -258,7 +257,7 @@ export default function ProductDetailClient({ initialProduct }) {
 
             <div className="bg-gray-50 p-4 rounded-lg overflow-hidden text-gray-500 text-sm leading-relaxed">
               <div
-                className="overflow-x-auto prose prose-sm max-w-none prose-p:text-gray-500 prose-strong:text-gray-600 prose-a:text-[var(--maincolor)]"
+                className="product-html-from-editor product-description-tables product-table-scroll overflow-x-auto text-slate-800 leading-relaxed antialiased [&_a]:text-[var(--maincolor)] [&_a]:underline [&_a]:font-medium"
                 dangerouslySetInnerHTML={{ __html: product.shortDesc }}
               />
             </div>
@@ -272,6 +271,7 @@ export default function ProductDetailClient({ initialProduct }) {
           </div>
         </div>
 
+        {/* FULL DESCRIPTION */}
         {product.description && (
           <div className="mt-10 w-full">
             <div className="flex items-center gap-2 border-b mb-4">
@@ -282,7 +282,7 @@ export default function ProductDetailClient({ initialProduct }) {
             </div>
             <div className="bg-slate-50/90 p-4 md:p-6 rounded-xl border border-slate-200/80 overflow-hidden w-full shadow-sm">
               <div
-                className="product-html-from-editor product-description-tables product-table-scroll w-full text-slate-800 leading-relaxed text-[15px] md:text-[16px] antialiased [&_a]:text-[var(--maincolor)] [&_a]:underline [&_a]:font-medium"
+                className="product-html-from-editor product-description-tables product-table-scroll w-full text-slate-800 leading-relaxed antialiased [&_a]:text-[var(--maincolor)] [&_a]:underline [&_a]:font-medium"
                 dangerouslySetInnerHTML={{ __html: product.description }}
               />
             </div>
