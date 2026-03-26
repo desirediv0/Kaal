@@ -273,17 +273,22 @@
 .product-description-tables table {
   border: 1px solid var(--pt-border) !important;
   border-collapse: collapse !important;
-  width: 100% !important;
+  width: min(100%, 920px) !important;
   min-width: 300px !important;
-  max-width: 100% !important;
+  max-width: 920px !important;
   table-layout: auto !important;
   /* Let Jodit inline styles + cell-level font sizes win (no !important) */
-  font-size: inherit;
+  font-size: 13px;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  /* Override inline editor margins/floats so every product table stays centered */
+  margin-left: auto !important;
+  margin-right: auto !important;
+  float: none !important;
+  display: table !important;
 }
 @media (min-width: 768px) {
   .product-description-tables table {
-    font-size: inherit;
+    font-size: 14px;
   }
 }
 .product-description-tables table th,
@@ -294,10 +299,23 @@
   box-sizing: border-box !important;
   text-align: center !important;
   vertical-align: middle !important;
+  font-size: 13px !important;
   line-height: 1.2 !important;
   word-wrap: break-word !important;
   overflow-wrap: break-word !important;
   hyphens: auto;
+}
+@media (min-width: 768px) {
+  .product-description-tables table th,
+  .product-description-tables table td {
+    font-size: 14px !important;
+  }
+}
+
+/* Some products have inline span/strong font-size from editor; normalize across all slugs */
+.product-description-tables table th *,
+.product-description-tables table td * {
+  font-size: inherit !important;
 }
 
 /* HEADER — saari <thead> rows same blue */
@@ -306,7 +324,7 @@
   background-color: var(--pt-header-bg) !important;
   background: var(--pt-header-bg) !important;
   color: var(--pt-header-fg) !important;
-  font-weight: inherit;
+  font-weight: 600;
 }
 .product-description-tables table thead th *,
 .product-description-tables table thead td * {
@@ -323,7 +341,7 @@
   background-color: var(--pt-header-bg) !important;
   background: var(--pt-header-bg) !important;
   color: var(--pt-header-fg) !important;
-  font-weight: inherit;
+  font-weight: 600;
 }
 .product-description-tables
   table:not(:has(thead))
@@ -350,7 +368,7 @@
   th {
   background-color: var(--pt-header-bg) !important;
   color: var(--pt-header-fg) !important;
-  font-weight: inherit;
+  font-weight: 600;
 }
 .product-description-tables
   table:not(:has(thead))
