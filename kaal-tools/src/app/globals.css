@@ -285,10 +285,8 @@
   min-width: 300px !important;
   max-width: 920px !important;
   table-layout: auto !important;
-  /* Let Jodit inline styles + cell-level font sizes win (no !important) */
-  font-size: 13px;
+  font-size: 13px !important;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
-  /* Override inline editor margins/floats so every product table stays centered */
   margin-left: auto !important;
   margin-right: auto !important;
   float: none !important;
@@ -296,7 +294,7 @@
 }
 @media (min-width: 768px) {
   .product-description-tables table {
-    font-size: 14px;
+    font-size: 14px !important;
   }
 }
 .product-description-tables table th,
@@ -307,8 +305,9 @@
   box-sizing: border-box !important;
   text-align: center !important;
   vertical-align: middle !important;
-  /* No !important on font-size — lets Jodit inline style="font-size:16px" etc. win */
-  font-size: 13px;
+  /* !important forces ALL products to same size — overrides Jodit inline font-size */
+  font-size: 13px !important;
+  font-weight: 300 !important;
   line-height: 1.4 !important;
   word-wrap: break-word !important;
   overflow-wrap: break-word !important;
@@ -317,15 +316,13 @@
 @media (min-width: 768px) {
   .product-description-tables table th,
   .product-description-tables table td {
-    font-size: 14px;
+    font-size: 14px !important;
   }
 }
-
-/* Allow Jodit inline font-size (e.g. Arial 16) to display correctly.
-   Only normalize font-family on spans that don't have their own style. */
-.product-description-tables table th span:not([style]),
-.product-description-tables table td span:not([style]) {
-  font-size: inherit;
+/* Force spans/strong/b inside cells to also use consistent font-size */
+.product-description-tables table th *,
+.product-description-tables table td * {
+  font-size: inherit !important;
 }
 
 /* HEADER — same threading: CSS default blue only when user has NOT set a background */
@@ -337,7 +334,7 @@
 .product-description-tables table thead th,
 .product-description-tables table thead td {
   color: var(--pt-header-fg) !important;
-  font-weight: 600;
+  font-weight: 500 !important;
 }
 /* thead child text: white unless user set an explicit color */
 .product-description-tables table thead th *:not([style*="color"]),
@@ -358,7 +355,7 @@
 .product-description-tables table tr:first-child td:not([style*="background"]) {
   background-color: var(--pt-header-bg) !important;
 }
-/* First row text always white */
+/* First row text always white + medium weight */
 .product-description-tables table:not(:has(thead)) > tbody > tr:first-child th,
 .product-description-tables table:not(:has(thead)) > tbody > tr:first-child td,
 .product-description-tables table tbody:first-child tr:first-child th,
@@ -366,7 +363,7 @@
 .product-description-tables table tr:first-child th,
 .product-description-tables table tr:first-child td {
   color: var(--pt-header-fg) !important;
-  font-weight: 600;
+  font-weight: 500 !important;
 }
 .product-description-tables table:not(:has(thead)) > tbody > tr:first-child th *:not([style*="color"]),
 .product-description-tables table:not(:has(thead)) > tbody > tr:first-child td *:not([style*="color"]),
@@ -390,7 +387,7 @@
   > tr:nth-child(2)
   th {
   color: var(--pt-header-fg) !important;
-  font-weight: 600;
+  font-weight: 500 !important;
 }
 .product-description-tables
   table:not(:has(thead))
