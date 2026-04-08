@@ -150,42 +150,76 @@ body {
   line-height: 1.5;
   word-wrap: break-word;
   overflow-wrap: break-word;
+  /* No !important — lets Jodit inline style="font-size:16px" etc. win */
+  font-size: 15px;
 }
+/* thead header cells — CSS default blue only when user has NOT set a background */
+.jodit-wysiwyg table thead th:not([style*="background"]),
+.jodit-wysiwyg table thead td:not([style*="background"]) {
+  background-color: var(--pt-header-bg) !important;
+}
+/* Text + weight always forced on header cells */
 .jodit-wysiwyg table thead th,
 .jodit-wysiwyg table thead td {
-  background-color: var(--pt-header-bg) !important;
   color: var(--pt-header-fg) !important;
   font-weight: 700 !important;
 }
-.jodit-wysiwyg table thead th *,
-.jodit-wysiwyg table thead td * {
+/* Header cell child elements: white text unless user explicitly set a color */
+.jodit-wysiwyg table thead th *:not([style*="color"]),
+.jodit-wysiwyg table thead td *:not([style*="color"]) {
   color: #ffffff !important;
 }
+/* User-set color on child spans — inherit from cell */
+.jodit-wysiwyg table thead th [style*="color"],
+.jodit-wysiwyg table thead td [style*="color"] {
+  color: inherit;
+}
+/* First row — CSS default blue only when user has NOT set a background */
+.jodit-wysiwyg table:not(:has(thead)) > tbody > tr:first-child th:not([style*="background"]),
+.jodit-wysiwyg table:not(:has(thead)) > tbody > tr:first-child td:not([style*="background"]),
+.jodit-wysiwyg table tr:first-child th:not([style*="background"]),
+.jodit-wysiwyg table tr:first-child td:not([style*="background"]) {
+  background-color: var(--pt-header-bg) !important;
+}
+/* First row text always white */
 .jodit-wysiwyg table:not(:has(thead)) > tbody > tr:first-child th,
 .jodit-wysiwyg table:not(:has(thead)) > tbody > tr:first-child td,
 .jodit-wysiwyg table tr:first-child th,
 .jodit-wysiwyg table tr:first-child td {
-  background-color: var(--pt-header-bg) !important;
   color: var(--pt-header-fg) !important;
   font-weight: 700 !important;
 }
-.jodit-wysiwyg table tbody tr td,
-.jodit-wysiwyg table tbody tr th,
-.jodit-wysiwyg table tr:nth-child(n+3) td,
-.jodit-wysiwyg table tr:nth-child(n+3) th {
+/* First-row header cell children: white only when no explicit color */
+.jodit-wysiwyg table:not(:has(thead)) > tbody > tr:first-child th *:not([style*="color"]),
+.jodit-wysiwyg table:not(:has(thead)) > tbody > tr:first-child td *:not([style*="color"]),
+.jodit-wysiwyg table tr:first-child th *:not([style*="color"]),
+.jodit-wysiwyg table tr:first-child td *:not([style*="color"]) {
+  color: #ffffff !important;
+}
+/* Body row text color — only when no explicit inline color set by user */
+.jodit-wysiwyg table tbody tr td:not([style*="color"]),
+.jodit-wysiwyg table tbody tr th:not([style*="color"]),
+.jodit-wysiwyg table tr:nth-child(n+3) td:not([style*="color"]),
+.jodit-wysiwyg table tr:nth-child(n+3) th:not([style*="color"]) {
   color: var(--pt-body-fg);
   font-weight: 400;
 }
-.jodit-wysiwyg table tbody tr:nth-child(odd) td,
-.jodit-wysiwyg table tbody tr:nth-child(odd) th,
-.jodit-wysiwyg table tr:nth-child(odd):not(:first-child):not(:nth-child(2)) td,
-.jodit-wysiwyg table tr:nth-child(odd):not(:first-child):not(:nth-child(2)) th {
-  background-color: var(--pt-zebra-odd) !important;
+/* Body inline color spans: let them show — don't override */
+.jodit-wysiwyg table tbody tr td [style*="color"],
+.jodit-wysiwyg table tbody tr th [style*="color"] {
+  color: inherit;
 }
-.jodit-wysiwyg table tbody tr:nth-child(even) td,
-.jodit-wysiwyg table tbody tr:nth-child(even) th,
-.jodit-wysiwyg table tr:nth-child(even):not(:first-child):not(:nth-child(2)) td {
-  background-color: var(--pt-zebra-even) !important;
+/* Zebra bg — only when no explicit background-color inline style set by user */
+.jodit-wysiwyg table tbody tr:nth-child(odd) td:not([style*="background"]),
+.jodit-wysiwyg table tbody tr:nth-child(odd) th:not([style*="background"]),
+.jodit-wysiwyg table tr:nth-child(odd):not(:first-child):not(:nth-child(2)) td:not([style*="background"]),
+.jodit-wysiwyg table tr:nth-child(odd):not(:first-child):not(:nth-child(2)) th:not([style*="background"]) {
+  background-color: var(--pt-zebra-odd);
+}
+.jodit-wysiwyg table tbody tr:nth-child(even) td:not([style*="background"]),
+.jodit-wysiwyg table tbody tr:nth-child(even) th:not([style*="background"]),
+.jodit-wysiwyg table tr:nth-child(even):not(:first-child):not(:nth-child(2)) td:not([style*="background"]) {
+  background-color: var(--pt-zebra-even);
 }
 /* Rowspan sub-header row (Inch/mm) — colgroup ke baad bhi ~ tbody */
 .jodit-wysiwyg table thead:has(> tr:only-child) ~ tbody:first-of-type > tr:first-child th,

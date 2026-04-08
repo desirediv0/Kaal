@@ -343,20 +343,21 @@ export const updateProduct = asyncHandler(async (req, res) => {
 
   const updateFields = {};
 
-  // Basic field validation
-  if (title && title !== product.title) {
+  // Always update content fields (Jodit HTML content — don't skip identical checks)
+  if (title) {
     validateText(title);
     updateFields.title = title.trim();
-    updateFields.slug = await generateUniqueSlug(null, title);
+    // Only regenerate slug if title actually changed
+    if (title.trim() !== product.title) {
+      updateFields.slug = await generateUniqueSlug(null, title);
+    }
   }
 
-  if (description && description !== product.description) {
-    validateText(description);
+  // description and shortDesc come from Jodit (HTML) — always save, no validateText
+  if (description !== undefined && description !== null) {
     updateFields.description = description.trim();
   }
-
-  if (shortDesc && shortDesc !== product.shortDesc) {
-    validateText(shortDesc);
+  if (shortDesc !== undefined && shortDesc !== null) {
     updateFields.shortDesc = shortDesc.trim();
   }
 
@@ -383,120 +384,99 @@ export const updateProduct = asyncHandler(async (req, res) => {
     updateFields.salePrice = parsedSalePrice;
   }
 
-  try {
-    const updatedProduct = await prisma.$transaction(async (prisma) => {
-      // Always update relations
-      await prisma.productCategory.deleteMany({
-        where: { productId: product.id },
-      });
+  // Collect images to delete BEFORE the transaction (S3 calls inside transaction = timeout)
+  const oldMainImageUrl = req.files?.image?.[0] ? product.image : null;
+  const oldAdditionalImageUrls =
+    req.files?.images?.length ? product.images.map((img) => img.url) : [];
 
-      await prisma.productCategory.createMany({
-        data: categoryIds.map((id) => ({
-          productId: product.id,
-          categoryId: id,
+  try {
+    // ── Direct sequential DB operations — no transaction wrapper (avoids P2028 timeout) ──
+
+    // 1. Update category relations
+    await prisma.productCategory.deleteMany({ where: { productId: product.id } });
+    await prisma.productCategory.createMany({
+      data: categoryIds.map((id) => ({ productId: product.id, categoryId: id })),
+    });
+
+    // 2. Update subcategory relations
+    await prisma.productSubCategory.deleteMany({ where: { productId: product.id } });
+    if (subCategoryIds.length > 0) {
+      await prisma.productSubCategory.createMany({
+        data: subCategoryIds.map((id) => ({ productId: product.id, subCategoryId: id })),
+      });
+    }
+
+    // 3. Build image field if a new main image was uploaded
+    const imageUpdateData = {};
+    if (req.files?.image?.[0]) {
+      imageUpdateData.image = getImageUrl(req.files.image[0].filename);
+    }
+
+    // 4. Update product core fields + optional new main image
+    let updatedProduct = await prisma.products.update({
+      where: { id: product.id },
+      data: { ...updateFields, ...imageUpdateData },
+      include: {
+        categories: { include: { category: true } },
+        subCategories: { include: { subCategory: true } },
+        images: true,
+      },
+    });
+
+    // 5. Handle additional images (DB only — S3 deletes happen after)
+    if (req.files?.images?.length) {
+      await prisma.productImage.deleteMany({ where: { productId: updatedProduct.id } });
+      await prisma.productImage.createMany({
+        data: req.files.images.map((file) => ({
+          url: getImageUrl(file.filename),
+          productId: updatedProduct.id,
         })),
       });
 
-      await prisma.productSubCategory.deleteMany({
-        where: { productId: product.id },
-      });
-
-      if (subCategoryIds.length > 0) {
-        await prisma.productSubCategory.createMany({
-          data: subCategoryIds.map((id) => ({
-            productId: product.id,
-            subCategoryId: id,
-          })),
-        });
-      }
-
-      // Update product data
-      let updatedProduct = await prisma.products.update({
-        where: { slug },
-        data: updateFields,
+      updatedProduct = await prisma.products.findUnique({
+        where: { id: updatedProduct.id },
         include: {
-          categories: {
-            include: { category: true },
-          },
-          subCategories: {
-            include: { subCategory: true },
-          },
+          categories: { include: { category: true } },
+          subCategories: { include: { subCategory: true } },
           images: true,
         },
       });
+    }
 
-      // Handle main image
-      if (req.files?.image?.[0]) {
-        if (updatedProduct.image) {
-          await deleteFromS3(updatedProduct.image);
-        }
-
-        updatedProduct = await prisma.products.update({
-          where: { id: updatedProduct.id },
-          data: {
-            image: getImageUrl(req.files.image[0].filename),
-          },
-          include: {
-            categories: { include: { category: true } },
-            subCategories: { include: { subCategory: true } },
-            images: true,
-          },
-        });
-      }
-
-      // Handle additional images
-      if (req.files?.images?.length) {
-        // Delete existing images
-        await Promise.all(
-          updatedProduct.images.map((img) => deleteFromS3(img.url))
-        );
-
-        await prisma.productImage.deleteMany({
-          where: { productId: updatedProduct.id },
-        });
-
-        // Create new images
-        await prisma.productImage.createMany({
-          data: req.files.images.map((file) => ({
-            url: getImageUrl(file.filename),
-            productId: updatedProduct.id,
-          })),
-        });
-
-        // Get fresh data
-        updatedProduct = await prisma.products.findUnique({
-          where: { id: updatedProduct.id },
-          include: {
-            categories: { include: { category: true } },
-            subCategories: { include: { subCategory: true } },
-            images: true,
-          },
-        });
-      }
-
-      return updatedProduct;
-    });
+    // 6. S3 deletes AFTER all DB writes succeed
+    if (oldMainImageUrl) {
+      deleteFromS3(oldMainImageUrl).catch((e) =>
+        console.error("S3 old main image cleanup failed:", e)
+      );
+    }
+    if (oldAdditionalImageUrls.length) {
+      Promise.all(oldAdditionalImageUrls.map((url) => deleteFromS3(url))).catch(
+        (e) => console.error("S3 old additional images cleanup failed:", e)
+      );
+    }
 
     return res
       .status(200)
-      .json(
-        new ApiResponse(200, "Product updated successfully", updatedProduct)
-      );
+      .json(new ApiResponse(200, "Product updated successfully", updatedProduct));
+
   } catch (error) {
-    // Cleanup uploaded files on error
+    // Cleanup newly uploaded files on error (they won't be referenced in DB)
     if (req.files?.image?.[0]) {
-      await deleteFromS3(getImageUrl(req.files.image[0].filename));
+      deleteFromS3(getImageUrl(req.files.image[0].filename)).catch((e) =>
+        console.error("S3 new main image cleanup failed:", e)
+      );
     }
     if (req.files?.images?.length) {
-      await Promise.all(
+      Promise.all(
         req.files.images.map((file) => deleteFromS3(getImageUrl(file.filename)))
-      );
+      ).catch((e) => console.error("S3 new additional images cleanup failed:", e));
     }
 
     console.error("Error updating product:", error);
     throw new ApiError(500, `Failed to update product: ${error.message}`);
   }
 });
+
 
 export const getAllProducts = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;

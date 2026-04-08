@@ -252,9 +252,17 @@
   color: #1e293b;
   letter-spacing: -0.01em;
 }
-.product-html-from-editor strong,
-.product-html-from-editor b {
+/* Dark color for bold text — but NOT inside table cells (header cells need white) */
+.product-html-from-editor strong:not(td strong):not(th strong),
+.product-html-from-editor b:not(td b):not(th b) {
   color: #0f172a;
+}
+/* Inside table td/th — bold text inherits cell color (white on blue header, dark on body) */
+.product-html-from-editor td strong,
+.product-html-from-editor td b,
+.product-html-from-editor th strong,
+.product-html-from-editor th b {
+  color: inherit;
 }
 
 /*
@@ -299,8 +307,9 @@
   box-sizing: border-box !important;
   text-align: center !important;
   vertical-align: middle !important;
-  font-size: 13px !important;
-  line-height: 1.2 !important;
+  /* No !important on font-size — lets Jodit inline style="font-size:16px" etc. win */
+  font-size: 13px;
+  line-height: 1.4 !important;
   word-wrap: break-word !important;
   overflow-wrap: break-word !important;
   hyphens: auto;
@@ -308,65 +317,78 @@
 @media (min-width: 768px) {
   .product-description-tables table th,
   .product-description-tables table td {
-    font-size: 14px !important;
+    font-size: 14px;
   }
 }
 
-/* Some products have inline span/strong font-size from editor; normalize across all slugs */
-.product-description-tables table th *,
-.product-description-tables table td * {
-  font-size: inherit !important;
+/* Allow Jodit inline font-size (e.g. Arial 16) to display correctly.
+   Only normalize font-family on spans that don't have their own style. */
+.product-description-tables table th span:not([style]),
+.product-description-tables table td span:not([style]) {
+  font-size: inherit;
 }
 
-/* HEADER — saari <thead> rows same blue */
+/* HEADER — same threading: CSS default blue only when user has NOT set a background */
+.product-description-tables table thead th:not([style*="background"]),
+.product-description-tables table thead td:not([style*="background"]) {
+  background-color: var(--pt-header-bg) !important;
+}
+/* Text + weight always forced on thead cells */
 .product-description-tables table thead th,
 .product-description-tables table thead td {
-  background-color: var(--pt-header-bg) !important;
-  background: var(--pt-header-bg) !important;
   color: var(--pt-header-fg) !important;
   font-weight: 600;
 }
-.product-description-tables table thead th *,
-.product-description-tables table thead td * {
+/* thead child text: white unless user set an explicit color */
+.product-description-tables table thead th *:not([style*="color"]),
+.product-description-tables table thead td *:not([style*="color"]) {
   color: #ffffff !important;
 }
+.product-description-tables table thead th [style*="color"],
+.product-description-tables table thead td [style*="color"] {
+  color: inherit;
+}
 
-/* <thead> ke bina: pehli row = main header */
+/* No thead: first row = main header (CSS default only when no inline bg) */
+.product-description-tables table:not(:has(thead)) > tbody > tr:first-child th:not([style*="background"]),
+.product-description-tables table:not(:has(thead)) > tbody > tr:first-child td:not([style*="background"]),
+.product-description-tables table tbody:first-child tr:first-child th:not([style*="background"]),
+.product-description-tables table tbody:first-child tr:first-child td:not([style*="background"]),
+.product-description-tables table tr:first-child th:not([style*="background"]),
+.product-description-tables table tr:first-child td:not([style*="background"]) {
+  background-color: var(--pt-header-bg) !important;
+}
+/* First row text always white */
 .product-description-tables table:not(:has(thead)) > tbody > tr:first-child th,
 .product-description-tables table:not(:has(thead)) > tbody > tr:first-child td,
 .product-description-tables table tbody:first-child tr:first-child th,
 .product-description-tables table tbody:first-child tr:first-child td,
 .product-description-tables table tr:first-child th,
 .product-description-tables table tr:first-child td {
-  background-color: var(--pt-header-bg) !important;
-  background: var(--pt-header-bg) !important;
   color: var(--pt-header-fg) !important;
   font-weight: 600;
 }
-.product-description-tables
-  table:not(:has(thead))
-  > tbody
-  > tr:first-child
-  th
-  *,
-.product-description-tables
-  table:not(:has(thead))
-  > tbody
-  > tr:first-child
-  td
-  *,
-.product-description-tables table tr:first-child th *,
-.product-description-tables table tr:first-child td * {
+.product-description-tables table:not(:has(thead)) > tbody > tr:first-child th *:not([style*="color"]),
+.product-description-tables table:not(:has(thead)) > tbody > tr:first-child td *:not([style*="color"]),
+.product-description-tables table tr:first-child th *:not([style*="color"]),
+.product-description-tables table tr:first-child td *:not([style*="color"]) {
   color: #ffffff !important;
 }
 
-/* <thead> ke bina: doosri row sub-header (Inch/mm) sirf jab cells <th> hon — same blue */
+
+/* No thead: 2nd row sub-header (Inch/mm when th) — CSS default only when no inline bg */
+.product-description-tables
+  table:not(:has(thead))
+  > tbody
+  > tr:nth-child(2)
+  th:not([style*="background"]) {
+  background-color: var(--pt-header-bg) !important;
+}
 .product-description-tables
   table:not(:has(thead))
   > tbody
   > tr:nth-child(2)
   th {
-  background-color: var(--pt-header-bg) !important;
   color: var(--pt-header-fg) !important;
   font-weight: 600;
 }
@@ -375,37 +397,43 @@
   > tbody
   > tr:nth-child(2)
   th
-  * {
+  *:not([style*="color"]) {
   color: #ffffff !important;
 }
 
-/* Body - zebra (cell par color — bina !important taaki span[style] Jodit colors dikhein) */
-.product-description-tables table tbody tr td,
-.product-description-tables table tbody tr th,
-.product-description-tables table tr:nth-child(n + 3) td,
-.product-description-tables table tr:nth-child(n + 3) th {
+/* Body text color — only when user has NOT set an inline color */
+.product-description-tables table tbody tr td:not([style*="color"]),
+.product-description-tables table tbody tr th:not([style*="color"]),
+.product-description-tables table tr:nth-child(n + 3) td:not([style*="color"]),
+.product-description-tables table tr:nth-child(n + 3) th:not([style*="color"]) {
   color: var(--pt-body-fg);
   font-weight: inherit;
 }
-.product-description-tables table tbody tr:nth-child(odd) td,
-.product-description-tables table tbody tr:nth-child(odd) th,
-.product-description-tables
-  table
-  tr:nth-child(odd):not(:first-child):not(:nth-child(2))
-  td,
-.product-description-tables
-  table
-  tr:nth-child(odd):not(:first-child):not(:nth-child(2))
-  th {
-  background-color: var(--pt-zebra-odd) !important;
+/* Inline color spans: let them show */
+.product-description-tables table tbody tr td [style*="color"],
+.product-description-tables table tbody tr th [style*="color"] {
+  color: inherit;
 }
-.product-description-tables table tbody tr:nth-child(even) td,
-.product-description-tables table tbody tr:nth-child(even) th,
+/* Zebra bg — only when no inline background-color set by user */
+.product-description-tables table tbody tr:nth-child(odd) td:not([style*="background"]),
+.product-description-tables table tbody tr:nth-child(odd) th:not([style*="background"]),
+.product-description-tables
+  table
+  tr:nth-child(odd):not(:first-child):not(:nth-child(2))
+  td:not([style*="background"]),
+.product-description-tables
+  table
+  tr:nth-child(odd):not(:first-child):not(:nth-child(2))
+  th:not([style*="background"]) {
+  background-color: var(--pt-zebra-odd);
+}
+.product-description-tables table tbody tr:nth-child(even) td:not([style*="background"]),
+.product-description-tables table tbody tr:nth-child(even) th:not([style*="background"]),
 .product-description-tables
   table
   tr:nth-child(even):not(:first-child):not(:nth-child(2))
-  td {
-  background-color: var(--pt-zebra-even) !important;
+  td:not([style*="background"]) {
+  background-color: var(--pt-zebra-even);
 }
 /*
  * Zebra ke BAAD: rowspan — pehli thead row, Inch/mm <tbody> ki pehli row.
